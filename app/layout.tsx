@@ -3,6 +3,15 @@ import type { ReactNode } from "react";
 import "@/styles/globals.css";
 import { SiteFooter } from "@/components/shell/SiteFooter";
 
+/**
+ * Every document renders per-request so the framework can attach the
+ * per-request CSP nonce (proxy.ts) to its inline bootstrap scripts —
+ * prerendered HTML cannot carry a request nonce and would fail the strict
+ * policy. Documents are small and privacy policy prefers uncached pages;
+ * static assets under /_next/static keep long immutable caching.
+ */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Arcanum",
   description: "A private reading space.",
