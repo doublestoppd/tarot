@@ -1,6 +1,7 @@
 import { ALL_CARDS, ALL_CARD_IDS, getCard } from "@/data/tarot/cards";
 import { CORRESPONDENCES } from "@/data/correspondences/graph";
 import { SOURCE_IDS, SOURCES } from "@/data/sources/manifest";
+import { ASSETS } from "@/data/sources/assets";
 import { SPREADS } from "@/data/spreads/spreads";
 import { DOMAINS, INSIGHT_LENSES, TIME_PERSPECTIVES } from "@/data/intake/taxonomy";
 import { SEED_PLACES } from "@/data/places/seed-places";
@@ -68,6 +69,14 @@ for (const source of SOURCES) {
   check(
     source.copyrightOrLicenseStatus.length > 0,
     `${source.id}: missing license status`,
+  );
+}
+check(ASSETS.length > 0, "asset manifest is empty");
+for (const asset of ASSETS) {
+  check(asset.copyrightStatus.length > 0, `${asset.id}: missing copyright status`);
+  check(
+    /^\d{4}-\d{2}-\d{2}$/.test(asset.verificationDate),
+    `${asset.id}: missing verification date`,
   );
 }
 

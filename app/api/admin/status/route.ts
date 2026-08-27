@@ -1,6 +1,31 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { apiJson, requireAdmin, withRoute } from "@/lib/http/api";
 import { getEnv, microToUsdString } from "@/lib/config/env";
+import { computeCurrentSky } from "@/domain/astrology/engine";
+
+/**
+ * Bounded astronomy self-check (spec §28: astronomy-provider fixture
+ * health): the current sky must produce eleven finite in-range bodies with
+ * plausible solar/lunar motion. Runs in a few milliseconds.
+ */
+function astronomyFixtureHealth(): "ok" | "failed" {
+  try {
+    const sky = computeCurrentSky(new Date());
+    if (sky.bodies.length !== 11) return "failed";
+    for (const body of sky.bodies) {
+      if (!Number.isFinite(body.longitude) || body.longitude < 0 || body.longitude >= 360) {
+        return "failed";
+      }
+    }
+    const sun = sky.bodies.find((b) => b.body === "sun")!;
+    const moon = sky.bodies.find((b) => b.body === "moon")!;
+    if (sun.speed < 0.9 || sun.speed > 1.1) return "failed";
+    if (moon.speed < 10 || moon.speed > 16) return "failed";
+    return "ok";
+  } catch {
+    return "failed";
+  }
+}
 
 /**
  * GET /api/admin/status (spec §28): aggregate operations data only — never
@@ -98,6 +123,7 @@ export const GET = withRoute("admin/status", async (request: NextRequest): Promi
     health: {
       database: "ok",
       providerConfigured: env.openai.apiKey !== null,
+      astronomyFixtures: astronomyFixtureHealth(),
       buildSha: process.env.BUILD_SHA ?? "dev",
       nodeEnv: env.nodeEnv,
     },

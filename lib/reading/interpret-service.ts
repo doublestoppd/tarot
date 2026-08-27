@@ -42,6 +42,10 @@ export type InterpretOutcome =
 
 export function buildSynthesizer(settings: AppSettings): ReadingSynthesizer | null {
   const env = getEnv();
+  // Explicitly configured in-house composer (spec §14.1 local synthesizer).
+  if (settings.aiProvider === "internal") {
+    return new FakeReadingSynthesizer("ok");
+  }
   if (env.openai.apiKey) {
     return new OpenAIReadingSynthesizer({
       apiKey: env.openai.apiKey,
@@ -51,7 +55,7 @@ export function buildSynthesizer(settings: AppSettings): ReadingSynthesizer | nu
     });
   }
   if (env.nodeEnv !== "production") {
-    // Keyless development/E2E runs use the deterministic fake adapter.
+    // Keyless development/E2E runs use the in-house composer.
     return new FakeReadingSynthesizer("ok");
   }
   return null;

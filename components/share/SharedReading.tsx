@@ -6,7 +6,7 @@ import {
   decryptShareArtifact,
   type SanitizedShareArtifact,
 } from "@/lib/client/share-crypto";
-import { CardArt } from "@/components/tarot/CardArt";
+import { activeDeckTheme } from "@/components/tarot/deck-theme";
 
 type State =
   | { kind: "loading" }
@@ -131,7 +131,7 @@ export function SharedReading({ shareId }: { shareId: string }) {
                       : undefined
                   }
                 >
-                  <CardArt cardId={card.cardId} />
+                  <activeDeckTheme.CardFace cardId={card.cardId} />
                 </div>
               </div>
             </div>

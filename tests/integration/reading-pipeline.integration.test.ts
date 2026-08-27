@@ -181,6 +181,24 @@ suite("reading pipeline (prepare → interpret)", () => {
     expect(retried.kind).toBe("ai");
   });
 
+  it("the configured internal provider serves full readings from the in-house composer", async () => {
+    const prepared = await prepareReading(pool, { selections });
+    const outcome = await interpretReading(
+      pool,
+      settings({ aiProvider: "internal" }),
+      {
+        ticket: prepared.ticket,
+        rateKeyHash: "install_internal",
+      },
+    );
+    expect(outcome.kind).toBe("ai");
+    if (outcome.kind !== "ai") return;
+    expect(outcome.synthesis.paragraphs.length).toBeGreaterThanOrEqual(5);
+    // Fully validated output: every cited id exists in the compiled context.
+    const { validateSynthesis } = await import("@/domain/safety/validate");
+    expect(validateSynthesis(outcome.synthesis, prepared.context).ok).toBe(true);
+  });
+
   it("falls back deterministically when AI is disabled — same cards, no charge", async () => {
     const prepared = await prepareReading(pool, { selections });
     const outcome = await interpretReading(pool, settings({ aiEnabled: false }), {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CardArt, CardBack } from "@/components/tarot/CardArt";
+import { activeDeckTheme } from "@/components/tarot/deck-theme";
 import type { ReadingDisplay } from "@/lib/reading/display";
 
 /**
@@ -29,7 +29,7 @@ export function CardRow({
             onClick={() => revealed && setDetail(index)}
             aria-label={
               revealed
-                ? `${card.name}, ${card.orientation}, position: ${card.positionLabel}. Show details.`
+                ? `${activeDeckTheme.altText({ canonicalName: card.name }, card.orientation, card.positionLabel)}. Show details.`
                 : "Card face down"
             }
           >
@@ -39,7 +39,7 @@ export function CardRow({
                 style={{ transitionDelay: revealed ? `${index * 140}ms` : "0ms" }}
               >
                 <div className="card-back">
-                  <CardBack />
+                  <activeDeckTheme.CardBack />
                 </div>
                 <div
                   className="card-front"
@@ -49,7 +49,7 @@ export function CardRow({
                       : undefined
                   }
                 >
-                  <CardArt cardId={card.cardId} />
+                  <activeDeckTheme.CardFace cardId={card.cardId} />
                 </div>
               </div>
             </div>

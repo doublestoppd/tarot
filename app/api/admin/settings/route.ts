@@ -16,6 +16,7 @@ const usd = z.string().regex(/^\d+(\.\d{1,6})?$/);
 const bodySchema = z.strictObject({
   aiEnabled: z.boolean().optional(),
   unlockEnabled: z.boolean().optional(),
+  aiProvider: z.enum(["openai", "internal"]).optional(),
   aiModel: z.string().min(1).max(80).optional(),
   dailyBudgetUsd: usd.optional(),
   monthlyBudgetUsd: usd.optional(),
@@ -40,6 +41,7 @@ export const PATCH = withRoute("admin/settings", async (request: NextRequest): P
   const updated = await updateSettings(auth.pool, {
     ...(body.aiEnabled !== undefined ? { aiEnabled: body.aiEnabled } : {}),
     ...(body.unlockEnabled !== undefined ? { unlockEnabled: body.unlockEnabled } : {}),
+    ...(body.aiProvider !== undefined ? { aiProvider: body.aiProvider } : {}),
     ...(body.aiModel !== undefined ? { aiModel: body.aiModel } : {}),
     ...(body.dailyBudgetUsd !== undefined
       ? { dailyBudgetMicro: usdToMicro(body.dailyBudgetUsd) }
@@ -69,6 +71,7 @@ export const PATCH = withRoute("admin/settings", async (request: NextRequest): P
   return apiJson({
     aiEnabled: updated.aiEnabled,
     unlockEnabled: updated.unlockEnabled,
+    aiProvider: updated.aiProvider,
     aiModel: updated.aiModel,
     dailyBudgetUsd: microToUsdString(updated.dailyBudgetMicro),
     monthlyBudgetUsd: microToUsdString(updated.monthlyBudgetMicro),

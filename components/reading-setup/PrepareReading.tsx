@@ -9,6 +9,10 @@ import {
   INSIGHT_LENSES,
   TIME_PERSPECTIVES,
 } from "@/data/intake/taxonomy";
+import {
+  compatibleSpreads,
+  selectSpread,
+} from "@/domain/tarot/spread-selection";
 import { readingSession } from "@/lib/client/reading-session";
 import type { ReadingDisplay } from "@/lib/reading/display";
 
@@ -35,6 +39,7 @@ export function PrepareReading() {
   const [timeId, setTimeId] = useState(DEFAULT_TIME_PERSPECTIVE_ID);
   const [depth, setDepth] = useState<Depth>("deep");
   const [reversals, setReversals] = useState(true);
+  const [spreadOverrideId, setSpreadOverrideId] = useState<string | null>(null);
 
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
@@ -58,7 +63,27 @@ export function PrepareReading() {
     setDomainId(id);
     const d = DOMAINS.find((x) => x.id === id);
     setFocusId(d?.focuses[0]?.id ?? null);
+    setSpreadOverrideId(null);
   }
+
+  // Recommended spread + same-depth alternatives (spec §8): users never need
+  // tarot expertise, but a subtle override remains available.
+  const spreadChoice = useMemo(() => {
+    if (!domainId || !focusId) return null;
+    const selections = {
+      domainId,
+      focusId,
+      insightId,
+      timePerspectiveId: timeId,
+      depth,
+      reversalsEnabled: reversals,
+    };
+    const recommended = selectSpread(selections);
+    const alternatives = compatibleSpreads(selections);
+    const effective =
+      alternatives.find((s) => s.id === spreadOverrideId) ?? recommended;
+    return { recommended, alternatives, effective };
+  }, [domainId, focusId, insightId, timeId, depth, reversals, spreadOverrideId]);
 
   // Birthplace lookup: the query only selects a canonical internal place
   // record (spec §3.1); it is never part of the reading itself.
@@ -128,6 +153,12 @@ export function PrepareReading() {
         depth,
         reversalsEnabled: reversals,
       };
+      if (
+        spreadChoice &&
+        spreadChoice.effective.id !== spreadChoice.recommended.id
+      ) {
+        body.spreadOverrideId = spreadChoice.effective.id;
+      }
       if (hasDate) {
         body.birth = {
           date: birthDate,
@@ -458,12 +489,44 @@ export function PrepareReading() {
                   type="button"
                   className="choice"
                   aria-pressed={depth === value}
-                  onClick={() => setDepth(value)}
+                  onClick={() => {
+                    setDepth(value);
+                    setSpreadOverrideId(null);
+                  }}
                 >
                   {label}
                 </button>
               ))}
             </div>
+            {spreadChoice && (
+              <>
+                <h3 style={{ marginTop: "1rem" }}>Spread</h3>
+                <p style={{ color: "var(--text-faint)", fontSize: "0.85rem", margin: "0 0 0.5rem" }}>
+                  Recommended for these choices: {spreadChoice.recommended.name} (
+                  {spreadChoice.recommended.cardCount} cards). Choose another if
+                  you prefer.
+                </p>
+                <div className="seg">
+                  {spreadChoice.alternatives.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className="choice"
+                      aria-pressed={spreadChoice.effective.id === s.id}
+                      title={s.description}
+                      onClick={() =>
+                        setSpreadOverrideId(
+                          s.id === spreadChoice.recommended.id ? null : s.id,
+                        )
+                      }
+                    >
+                      {s.name}
+                      {s.id === spreadChoice.recommended.id ? " ·  recommended" : ""}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </details>
       )}

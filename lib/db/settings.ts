@@ -112,6 +112,7 @@ export async function loadSettings(pool: Pool, options: { fresh?: boolean } = {}
 const UPDATABLE_COLUMNS: Record<string, string> = {
   aiEnabled: "ai_enabled",
   unlockEnabled: "unlock_enabled",
+  aiProvider: "ai_provider",
   aiModel: "ai_model",
   dailyBudgetMicro: "daily_budget_microusd",
   monthlyBudgetMicro: "monthly_budget_microusd",

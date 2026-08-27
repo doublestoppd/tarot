@@ -12,11 +12,14 @@ import { DEPTH_TARGETS } from "@/domain/reading-compiler/types";
 import { computeQualityFlags } from "@/domain/safety/validate";
 
 /**
- * Deterministic development/test synthesizer. Composes a contract-valid
- * synthesis (evidence-cited, depth-length compliant, style-safe) purely from
- * the compiled context so the full flow — budget, validation, UI — runs
- * without a provider key. Selected only outside production or explicitly in
- * tests; never a silent production substitute.
+ * The in-house reading composer (spec §14.1's local synthesizer slot).
+ * Deterministically composes a contract-valid synthesis — evidence-cited,
+ * depth-length compliant, style-safe — purely from the compiled context, so
+ * no external provider is involved. Three roles:
+ *   1. the `internal` provider (settings.aiProvider = "internal"),
+ *   2. the keyless development/E2E engine,
+ *   3. the test double (behaviors "fail"/"invalid").
+ * It is never a silent substitute when OpenAI is configured and selected.
  */
 export class FakeReadingSynthesizer implements ReadingSynthesizer {
   constructor(private readonly behavior: "ok" | "fail" | "invalid" = "ok") {}
@@ -154,3 +157,6 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
     },
   };
 }
+
+/** Provider-facing name for the in-house composer. */
+export { FakeReadingSynthesizer as InternalReadingSynthesizer };
