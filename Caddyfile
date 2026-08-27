@@ -1,0 +1,19 @@
+# Reverse proxy + automatic TLS (spec §39.3). The application layer sets the
+# Content-Security-Policy (per-request nonce) and the remaining security
+# headers; Caddy adds transport-level headers and strips Server.
+{$APP_DOMAIN} {
+  encode zstd gzip
+  reverse_proxy web:3000
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "no-referrer"
+    X-Frame-Options "DENY"
+    X-Robots-Tag "noindex, nofollow, noarchive"
+    -Server
+  }
+  log {
+    output stdout
+    format json
+  }
+}

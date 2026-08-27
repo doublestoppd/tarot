@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.pgdata
+test-results
+data/places/generated
+*.log
+.env*
+!.env.example
+docs
+tests/e2e/test-results
