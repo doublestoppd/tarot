@@ -62,7 +62,7 @@ function validSynthesis(context: ReturnType<typeof buildContext>): ReadingSynthe
   const ids = [...validEvidenceIds(context)];
   const cardIds = context.reading.cards.map((c) => c.evidenceId);
   const filler =
-    "The pattern here asks for patient attention: the position's purpose and the card's own register meet without strain, and the sensible reading lets that meeting stand at its natural size, neither inflated into drama nor dismissed as coincidence, while the surrounding cards keep their own counsel and lend the paragraph the weight of the spread as a whole.";
+    "The pattern here asks for patient attention. The position sets a question, and the card answers it in its own voice. Read the meeting at its natural size. Do not inflate it into drama, and do not wave it off as chance. The nearby cards lend their weight, and the paragraph carries the spread as a whole.";
   const paragraph = (evidenceIds: string[]) => ({
     text: filler + " " + filler,
     evidenceIds,

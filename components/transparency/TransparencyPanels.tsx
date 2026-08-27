@@ -99,9 +99,9 @@ export function WhatShapedButton({ display }: { display: ReadingDisplay }) {
       <dialog ref={detailRef} className="sheet" aria-label="Detailed basis">
         <div className="eyebrow">Detailed basis</div>
         <p style={{ color: "var(--text-faint)", fontSize: "0.85rem" }}>
-          Provenance for the factors this reading drew on. Traditions can
-          disagree; classifications name the tradition rather than asserting
-          universal consensus. This view exists only while the reading is open.
+          Where each factor in this reading comes from. Traditions can
+          disagree, so each row names its own tradition instead of claiming
+          all schools agree. This view exists only while the reading is open.
         </p>
         <div className="table-scroll">
           <table className="basis-table">

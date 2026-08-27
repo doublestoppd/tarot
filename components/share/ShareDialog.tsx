@@ -96,10 +96,10 @@ export function ShareDialog({
           </ul>
         </div>
         <p style={{ color: "var(--text-faint)", fontSize: "0.85rem" }}>
-          The reading itself may mention derived astrological or numerological
-          details when they were relevant. Private links expire after {shareTtlDays}{" "}
-          days. The link is encrypted in this browser; anyone opening it will
-          still need the access code.
+          The reading text itself may mention sky or number details where they
+          mattered. Private links expire after {shareTtlDays} days. The link
+          is encrypted in this browser, and anyone opening it will still need
+          the access code.
         </p>
 
         {error && (

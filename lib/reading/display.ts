@@ -86,7 +86,7 @@ function basisSummary(context: ReadingContext): ReadingDisplay["basisSummary"] {
     notIncluded.push("No personal birth information will be used.");
   } else if (!context.capability.natalHouses) {
     notIncluded.push(
-      "Natal houses and Ascendant — birth time and birthplace were not provided.",
+      "Houses and rising sign were left out because birth time and birthplace were not given.",
     );
   }
   return { included, notIncluded };

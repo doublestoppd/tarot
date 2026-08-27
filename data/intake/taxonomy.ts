@@ -207,70 +207,70 @@ export const INSIGHT_LENSES: InsightLensDefinition[] = [
     label: "The broader picture",
     effect: "balanced",
     description:
-      "Synthesize the primary pattern without over-prioritizing hidden or obstacle factors.",
+      "A balanced view of the whole pattern, without leaning on any one part.",
   },
   {
     id: "not_obvious",
     label: "What may not be obvious",
     effect: "hidden",
     description:
-      "Raise the relevance of hidden, reversed, contradictory, unconscious, and background-position evidence without inventing secrets.",
+      "Puts extra weight on what sits under the surface. It invents no secrets.",
   },
   {
     id: "influence",
     label: "What is influencing this most",
     effect: "influence",
     description:
-      "Prioritize the strongest symbolic pressures and repeated factors.",
+      "Puts extra weight on the strongest and most repeated forces in the spread.",
   },
   {
     id: "support",
     label: "What supports movement or growth",
     effect: "support",
     description:
-      "Prioritize constructive and supportive positions, dignities, strengths, and stabilizers.",
+      "Puts extra weight on what steadies you and helps things move.",
   },
   {
     id: "resistance",
     label: "What may be creating resistance",
     effect: "resistance",
     description:
-      "Prioritize restrictive, conflicting, reversed, or blocked patterns without diagnosing pathology.",
+      "Puts extra weight on what blocks, drags, or pushes back.",
   },
   {
     id: "change",
     label: "What is changing",
     effect: "change",
     description:
-      "Prioritize transition, movement, endings and beginnings, applying transits and temporal shifts.",
+      "Puts extra weight on endings, beginnings, and things in motion.",
   },
   {
     id: "caution",
     label: "What deserves caution or care",
     effect: "caution",
     description:
-      "Prioritize tension and risk symbolism while avoiding deterministic warnings.",
+      "Puts extra weight on points of strain and risk, without doom-saying.",
   },
   {
     id: "potential",
     label: "What potential is developing",
     effect: "potential",
     description:
-      "Prioritize emerging, opening, and supportive symbols without guaranteeing outcomes.",
+      "Puts extra weight on what is opening up. It promises no outcomes.",
   },
   {
     id: "integration",
     label: "How to integrate what is present",
     effect: "integration",
     description:
-      "Prioritize reconciliation of contradictory themes and practical synthesis.",
+      "Focuses on how the spread's opposing parts can be held together.",
   },
   {
     id: "direction",
     label: "Where the current pattern may be leading",
     effect: "direction",
     description:
-      "Discuss trajectory conditionally; never present the future as fixed fact.",
+      "Talks about where things point, as tendency and never as fixed fate.",
   },
 ];
 
@@ -279,34 +279,34 @@ export const TIME_PERSPECTIVES: TimePerspectiveDefinition[] = [
     id: "present_developing",
     label: "Present and developing pattern",
     weighting: "balanced",
-    description: "Balance current symbolism and applying near-term factors.",
+    description: "A balance of what is here now and what is building.",
   },
   {
     id: "near_term",
     label: "Near term",
     weighting: "near",
     description:
-      "Favor current lunar and fast-planet factors and immediate spread positions; no exact dated predictions.",
+      "Leans on fast-moving sky factors and the here-and-now. No dated predictions.",
   },
   {
     id: "developing",
     label: "Developing over time",
     weighting: "developing",
     description:
-      "Favor medium-cycle transits, repeated themes, and movement across spread positions.",
+      "Leans on medium-length cycles and themes that repeat as things unfold.",
   },
   {
     id: "longer",
     label: "Longer pattern",
     weighting: "longer",
     description:
-      "Favor slower planets, persistent natal themes, Major Arcana, and durable cycles.",
+      "Leans on slow cycles, lasting birth-chart themes, and the Major Arcana.",
   },
   {
     id: "none",
     label: "No particular timeframe",
     weighting: "none",
-    description: "Reduce temporal weighting; emphasize symbolic structure.",
+    description: "Sets timing aside and reads the symbols on their own.",
   },
 ];
 

@@ -14,33 +14,33 @@ import type {
  */
 
 const CONCEPT_THEME_LABELS: Record<string, { label: string; gloss: string }> = {
-  "element:fire": { label: "The current of Fire", gloss: "will, initiative, and momentum" },
-  "element:water": { label: "The current of Water", gloss: "feeling, relation, and imagination" },
-  "element:air": { label: "The current of Air", gloss: "thought, language, and judgment" },
-  "element:earth": { label: "The current of Earth", gloss: "body, work, and material ground" },
-  "planet:saturn": { label: "A Saturn tone", gloss: "structure, limits, and consequence" },
-  "planet:jupiter": { label: "A Jupiter tone", gloss: "expansion, confidence, and reach" },
-  "planet:mars": { label: "A Mars tone", gloss: "drive, friction, and decisive force" },
-  "planet:venus": { label: "A Venus tone", gloss: "relation, value, and attraction" },
-  "planet:mercury": { label: "A Mercury tone", gloss: "communication, analysis, and exchange" },
-  "planet:moon": { label: "A lunar tone", gloss: "tide, mood, and inner weather" },
-  "planet:sun": { label: "A solar tone", gloss: "identity, vitality, and visibility" },
-  "number:1": { label: "The pattern of One", gloss: "initiation and singular focus" },
-  "number:2": { label: "The pattern of Two", gloss: "polarity, pairing, and choice" },
-  "number:3": { label: "The pattern of Three", gloss: "growth and first synthesis" },
-  "number:4": { label: "The pattern of Four", gloss: "stability and consolidation" },
-  "number:5": { label: "The pattern of Five", gloss: "disruption and adjustment" },
-  "number:6": { label: "The pattern of Six", gloss: "repair, exchange, and harmony" },
-  "number:7": { label: "The pattern of Seven", gloss: "assessment and searching" },
-  "number:8": { label: "The pattern of Eight", gloss: "mastery and concentrated effort" },
-  "number:9": { label: "The pattern of Nine", gloss: "culmination and fullness" },
+  "element:fire": { label: "The current of Fire", gloss: "drive, and the push to act" },
+  "element:water": { label: "The current of Water", gloss: "feeling, closeness, and imagination" },
+  "element:air": { label: "The current of Air", gloss: "thought, words, and judgment" },
+  "element:earth": { label: "The current of Earth", gloss: "body, work, and money matters" },
+  "planet:saturn": { label: "A Saturn tone", gloss: "structure, limits, and what choices cost" },
+  "planet:jupiter": { label: "A Jupiter tone", gloss: "growth, confidence, and reach" },
+  "planet:mars": { label: "A Mars tone", gloss: "drive, friction, and force" },
+  "planet:venus": { label: "A Venus tone", gloss: "love, value, and attraction" },
+  "planet:mercury": { label: "A Mercury tone", gloss: "talk, thought, and exchange" },
+  "planet:moon": { label: "A lunar tone", gloss: "tides, moods, and inner weather" },
+  "planet:sun": { label: "A solar tone", gloss: "identity, life force, and being seen" },
+  "number:1": { label: "The pattern of One", gloss: "starts and single focus" },
+  "number:2": { label: "The pattern of Two", gloss: "pairs, choices, and balance" },
+  "number:3": { label: "The pattern of Three", gloss: "growth and first results" },
+  "number:4": { label: "The pattern of Four", gloss: "stability and holding steady" },
+  "number:5": { label: "The pattern of Five", gloss: "shake-ups and course corrections" },
+  "number:6": { label: "The pattern of Six", gloss: "repair, giving, and harmony" },
+  "number:7": { label: "The pattern of Seven", gloss: "weighing and searching" },
+  "number:8": { label: "The pattern of Eight", gloss: "mastery and steady effort" },
+  "number:9": { label: "The pattern of Nine", gloss: "fullness and near-completion" },
   "number:10": { label: "The pattern of Ten", gloss: "completion and turnover" },
 };
 
 function signThemeLabel(concept: string): { label: string; gloss: string } {
   const sign = concept.replace("sign:", "");
   const name = sign.charAt(0).toUpperCase() + sign.slice(1);
-  return { label: `A repeated ${name} emphasis`, gloss: `the ${name} register recurring across systems` };
+  return { label: `A repeated ${name} emphasis`, gloss: `the ${name} note sounding from more than one direction` };
 }
 
 function themeMeta(concept: string): { label: string; gloss: string } | null {
@@ -85,7 +85,7 @@ export function compileThemes(
     candidates.push({
       id: `theme_${concept.replace(":", "_")}`,
       label: meta.label,
-      shortThesis: `${meta.label} — ${meta.gloss} — is carried by ${nodes.length} converging signals (${[...roots].length} roots).`,
+      shortThesis: `${meta.label}: ${meta.gloss}. ${nodes.length} separate signals point the same way.`,
       significance,
       evidenceIds: nodes.map((n) => n.id),
       independentRootCount: roots.size,

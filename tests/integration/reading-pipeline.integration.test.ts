@@ -113,7 +113,7 @@ suite("reading pipeline (prepare → interpret)", () => {
     expect(prepared.context.capability.fullNatalChart).toBe(true);
     expect(prepared.context.capability.natalHouses).toBe(true);
     const facts = prepared.context.personalFactors.map((f) => f.displayFact).join("|");
-    expect(facts).toContain("Ascendant");
+    expect(facts).toContain("Rising sign");
   });
 
   it("rejects DST-gap birth times and requires a choice for ambiguous ones", async () => {

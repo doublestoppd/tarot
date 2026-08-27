@@ -156,9 +156,9 @@ export function extractPatterns(
     patterns.push({
       id: "pat_major_emphasis",
       kind: "major_emphasis",
-      statement: `${majors.length} of the ${n} cards are Major Arcana (${majors
+      statement: `${majors.length} of the ${n} cards are Major Arcana: ${majors
         .map(nameOf)
-        .join(", ")}), placing the spread's weight on larger arcs rather than day-to-day circumstance.`,
+        .join(", ")}. That puts the weight on big life currents, not small daily events.`,
       cardIds: majors.map((c) => c.card.id),
       conceptIds: [],
       weight: 5,
@@ -180,9 +180,9 @@ export function extractPatterns(
       patterns.push({
         id: `pat_suit_${suit}`,
         kind: "suit_emphasis",
-        statement: `${SUIT_LABEL[suit]} repeats ${cards.length} times (${cards
+        statement: `${SUIT_LABEL[suit]} appears ${cards.length} times here: ${cards
           .map(nameOf)
-          .join(", ")}), emphasizing its current throughout the spread.`,
+          .join(", ")}. One suit this strong sets the tone of the whole spread.`,
         cardIds: cards.map((c) => c.card.id),
         conceptIds: [`suit:${suit}`],
         weight: 5,
@@ -221,7 +221,7 @@ export function extractPatterns(
         patterns.push({
           id: `pat_element_absent_${element}`,
           kind: "element_absence",
-          statement: `${ELEMENT_LABEL[element]} is entirely absent from the spread — its mode of response is not currently in play.`,
+          statement: `There is no ${ELEMENT_LABEL[element]} in this spread. What ${ELEMENT_LABEL[element]} stands for is not part of this picture right now.`,
           cardIds: [],
           conceptIds: [`element:${element}`],
           weight: 3,
@@ -238,9 +238,9 @@ export function extractPatterns(
     patterns.push({
       id: "pat_court_emphasis",
       kind: "court_emphasis",
-      statement: `${courts.length} court cards appear (${courts
+      statement: `${courts.length} court cards appear here: ${courts
         .map(nameOf)
-        .join(", ")}), suggesting distinct roles, voices, or postures active in the situation.`,
+        .join(", ")}. Court cards often stand for people or roles, so several voices may be active in this situation.`,
       cardIds: courts.map((c) => c.card.id),
       conceptIds: [],
       weight: 4,
@@ -263,7 +263,7 @@ export function extractPatterns(
       patterns.push({
         id: `pat_number_${family}`,
         kind: "number_repetition",
-        statement: `The number ${family} recurs across ${cards
+        statement: `The number ${family} repeats across ${cards
           .map(nameOf)
           .join(" and ")}.`,
         cardIds: cards.map((c) => c.card.id),
@@ -290,9 +290,9 @@ export function extractPatterns(
       patterns.push({
         id: `pat_sequence_${run[0]}_${run[run.length - 1]}`,
         kind: "sequence",
-        statement: `A numeric progression from ${run[0]} to ${run[run.length - 1]} moves through the spread (${cards
+        statement: `The numbers ${run[0]} through ${run[run.length - 1]} appear in order across ${cards
           .map(nameOf)
-          .join(", ")}), suggesting a process underway rather than a static state.`,
+          .join(", ")}. That looks like a process in motion, moving step by step.`,
         cardIds: cards.map((c) => c.card.id),
         conceptIds: run.map((x) => `number:${x}`),
         weight: 4,
@@ -324,9 +324,9 @@ export function extractPatterns(
       patterns.push({
         id: `pat_attr_${concept.replace(":", "_")}`,
         kind: "attribution_repetition",
-        statement: `${conceptLabel(concept)} is attributed to more than one drawn card (${names.join(
+        statement: `${conceptLabel(concept)} is tied to more than one card here: ${names.join(
           ", ",
-        )}) in the Hermetic correspondence system, doubling its presence in the spread.`,
+        )}. That doubles its presence in the spread.`,
         cardIds: [...cardIds],
         conceptIds: [concept],
         weight: 7,
@@ -341,7 +341,7 @@ export function extractPatterns(
       id: "pat_all_upright",
       kind: "orientation_pattern",
       statement:
-        "Every card fell upright: the spread's energies express directly, with little internalized or blocked current.",
+        "Every card fell upright. The energy here moves in the open, with little held back.",
       cardIds: concepts.map((c) => c.card.id),
       conceptIds: [],
       weight: 3,
@@ -350,9 +350,9 @@ export function extractPatterns(
     patterns.push({
       id: "pat_reversal_majority",
       kind: "orientation_pattern",
-      statement: `${reversed.length} of ${n} cards fell reversed (${reversed
+      statement: `${reversed.length} of the ${n} cards fell reversed: ${reversed
         .map(nameOf)
-        .join(", ")}): much of the spread's energy runs internally, delayed, or against its own grain.`,
+        .join(", ")}. Much of this spread's energy turns inward, runs late, or pushes against itself.`,
       cardIds: reversed.map((c) => c.card.id),
       conceptIds: [],
       weight: 4,
@@ -367,9 +367,9 @@ export function extractPatterns(
       patterns.push({
         id: `pat_tension_${tagA}_${tagB}`,
         kind: "tension_pair",
-        statement: `The spread holds both ${label}: ${sideA
+        statement: `The spread holds both ${label}. On one side: ${sideA
           .map(nameOf)
-          .join(", ")} against ${sideB.map(nameOf).join(", ")}.`,
+          .join(", ")}. On the other: ${sideB.map(nameOf).join(", ")}.`,
         cardIds: [...sideA, ...sideB].map((c) => c.card.id),
         conceptIds: [`tension:${tagA}`, `tension:${tagB}`],
         weight: 5,

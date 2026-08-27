@@ -164,7 +164,7 @@ export function cardEvidence(
     return node(
       "ev_card",
       "tarot_card",
-      `${card.canonicalName} (${ORIENTATION_LABEL[drawn.orientation]}) in the "${position.label}" position — ${meaning}`,
+      `${card.canonicalName} (${ORIENTATION_LABEL[drawn.orientation]}) in the "${position.label}" position. ${meaning}`,
       base,
       [`draw:${card.id}`],
       {
@@ -230,6 +230,14 @@ const BODY_LABELS: Record<string, string> = {
   ic: "IC",
 };
 
+/** "the Sun"/"the Moon"/"the North Node" but bare planet names. */
+function bodyPhrase(body: string): string {
+  const label = BODY_LABELS[body] ?? body;
+  return ["sun", "moon", "north_node", "asc", "mc", "dsc", "ic"].includes(body)
+    ? `the ${label}`
+    : label;
+}
+
 /** Class A/B sign attributions of a drawn card (court signs are class C). */
 function classABSignAttributions(cardId: string): Array<{ sign: string; recordId: string }> {
   const out: Array<{ sign: string; recordId: string }> = [];
@@ -286,7 +294,7 @@ export function personalResonanceEvidence(
           node(
             "ev_res",
             "personal",
-            `${card.canonicalName} is one of your tarot birth cards (a modern birth-date convention), and it appeared in this random draw.`,
+            `${card.canonicalName} is one of your tarot birth cards, counted from your birth date. It also came up in this random draw.`,
             12,
             ["numerology:birth_cards", `draw:${card.id}`],
             {
@@ -316,7 +324,7 @@ export function personalResonanceEvidence(
           node(
             "ev_res",
             "personal",
-            `Your ${pn.label} repeats in the drawn spread through ${names}.`,
+            `Your ${pn.label} shows up in the cards too: ${names}.`,
             8,
             [pn.root, ...matching.map((c) => `draw:${c.id}`)],
             {
@@ -352,7 +360,7 @@ export function personalResonanceEvidence(
             node(
               "ev_res",
               "personal",
-              `Your natal ${BODY_LABELS[placement.body] ?? placement.body} in ${signLabel(placement.sign)} matches the ${signLabel(placement.sign)} attribution of the drawn ${card.canonicalName}.`,
+              `Your birth chart has ${bodyPhrase(placement.body)} in ${signLabel(placement.sign)}. ${card.canonicalName} is a ${signLabel(placement.sign)} card in this tradition, so the draw echoes your chart.`,
               10,
               [`natal:${placement.body}`, `draw:${card.id}`],
               {
@@ -379,7 +387,7 @@ export function personalResonanceEvidence(
             node(
               "ev_res",
               "personal",
-              `${planetLabel(attribution.planet)}, ruler of your ${SIGN_LABELS[natal.chart.chartRulerSign]} Ascendant, is the planet attributed to the drawn ${card.canonicalName}.`,
+              `Your rising sign is ${SIGN_LABELS[natal.chart.chartRulerSign]}, and ${planetLabel(attribution.planet)} is its ruling planet. ${card.canonicalName} is a ${planetLabel(attribution.planet)} card, so it speaks with extra weight for you.`,
               10,
               ["natal:chart_ruler", `draw:${card.id}`],
               {
@@ -407,12 +415,24 @@ export function currentSkyEvidence(
   const nodes: EvidenceNode[] = [];
 
   // Relevant transits within orb: +7 (weak-orb reduction applied here).
+  const ASPECT_PHRASE: Record<string, string> = {
+    conjunction: "sitting right beside",
+    opposition: "directly across from",
+    trine: "at an easy, flowing angle to",
+    square: "at a hard, testing angle to",
+    sextile: "at a friendly angle to",
+    quincunx: "at an awkward angle to",
+  };
   for (const transit of transits.slice(0, 8)) {
     const maxOrb = transit.transitingBody === "moon" ? 1.5 : 3;
     const ratio = transit.orb / maxOrb;
     const weakness = ratio <= 0.5 ? 1 : Math.max(0.55, 1 - 0.45 * ((ratio - 0.5) / 0.5));
     const applying =
-      transit.applying === null ? "" : transit.applying ? ", applying" : ", separating";
+      transit.applying === null
+        ? ""
+        : transit.applying
+          ? " The angle is still tightening."
+          : " The angle is starting to ease.";
     const slow = ["jupiter", "saturn", "uranus", "neptune", "pluto"].includes(
       transit.transitingBody,
     );
@@ -420,7 +440,7 @@ export function currentSkyEvidence(
       node(
         "ev_sky",
         "current_sky",
-        `At the draw moment, transiting ${BODY_LABELS[transit.transitingBody]} forms a ${transit.type} to your natal ${BODY_LABELS[transit.natalBody] ?? transit.natalBody} (orb ${transit.orb.toFixed(1)}°${applying}).`,
+        `In the sky right now, ${BODY_LABELS[transit.transitingBody]} is ${ASPECT_PHRASE[transit.type] ?? "at a meaningful angle to"} ${bodyPhrase(transit.natalBody)} in your birth chart.${applying}`,
         Math.round(7 * weakness * (transit.applying ? 1.05 : 1) * 10) / 10,
         [`current:${transit.transitingBody}`, `natal:${transit.natalBody}`],
         {
@@ -442,7 +462,7 @@ export function currentSkyEvidence(
             node(
               "ev_sky",
               "current_sky",
-              `The ${BODY_LABELS[body.body]} currently stands in ${signLabel(attribution.sign)}, the sign attributed to the drawn ${card.canonicalName}.`,
+              `The ${BODY_LABELS[body.body]} is in ${signLabel(attribution.sign)} right now. ${card.canonicalName} is a ${signLabel(attribution.sign)} card, so the sky echoes the draw.`,
               5,
               [`current:${body.body}`, `draw:${card.id}`],
               {
@@ -469,7 +489,7 @@ export function currentSkyEvidence(
             node(
               "ev_sky",
               "current_sky",
-              `The Sun is currently passing through the exact decan attributed to the drawn ${card.canonicalName} in the Golden Dawn system.`,
+              `The Sun is passing through the exact slice of ${signLabel(`sign:${signName}`)} tied to ${card.canonicalName}. The sky and this draw line up closely here.`,
               6,
               ["current:sun", `draw:${card.id}`],
               {
@@ -495,7 +515,7 @@ export function currentSkyEvidence(
       node(
         "ev_sky",
         "current_sky",
-        `The draw fell near the ${sky.lunar.phaseName} moon while ${names} appeared — the sky's lunar emphasis doubles the card's.`,
+        `This draw fell near the ${sky.lunar.phaseName} moon, and ${names} appeared. The sky and the cards share the same moon mood.`,
         3,
         ["current:moon", ...lunarCards.map((c) => `draw:${c.id}`)],
         {
@@ -530,7 +550,7 @@ export function hermeticEvidence(
             node(
               "ev_herm",
               "hermetic",
-              `In the Golden Dawn decan system, ${card.canonicalName} is ${planetLabel(ruler.targetConceptId)} in ${signLabel(sign.targetConceptId)} — ${planetLabel(ruler.targetConceptId)}'s manner moving through ${signLabel(sign.targetConceptId)}'s terrain.`,
+              `In the Golden Dawn card tradition, ${card.canonicalName} is tied to ${planetLabel(ruler.targetConceptId)} in ${signLabel(sign.targetConceptId)}. Think of ${planetLabel(ruler.targetConceptId)}'s way of acting, set on ${signLabel(sign.targetConceptId)}'s ground.`,
               3,
               [`draw:${card.id}`],
               {
@@ -550,7 +570,7 @@ export function hermeticEvidence(
           node(
             "ev_herm",
             "hermetic",
-            `${card.canonicalName} carries the letter ${letterName} and its path on the Tree of Life in Hermetic Qabalah.`,
+            `In Hermetic Qabalah, ${card.canonicalName} carries the Hebrew letter ${letterName}. That letter marks one path on the Tree of Life.`,
             3,
             [`draw:${card.id}`],
             {
@@ -571,7 +591,7 @@ export function hermeticEvidence(
             node(
               "ev_herm",
               "hermetic",
-              `${card.canonicalName} sits at ${rec.notes?.includes("↔") ? rec.notes.split("↔")[1]!.split("(")[0]!.trim() : `sephira ${rec.targetConceptId.replace("sephira:", "")}`} on the Hermetic Tree of Life, the station its number holds in every suit.`,
+              `${card.canonicalName} sits at ${rec.notes?.includes("↔") ? rec.notes.split("↔")[1]!.split("(")[0]!.trim() : `sephira ${rec.targetConceptId.replace("sephira:", "")}`} on the Tree of Life. Every card with this number shares that station.`,
               2,
               [`draw:${card.id}`],
               {

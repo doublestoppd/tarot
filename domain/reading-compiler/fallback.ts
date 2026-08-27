@@ -14,13 +14,10 @@ export function renderDeterministicReading(context: ReadingContext): ReadingSynt
   // Opening: spread, domain, dominant theme if present.
   const topTheme = context.themes[0];
   const openingParts = [
-    `This ${context.reading.spread.name} reading was drawn for ${context.reading.domain.label.toLowerCase()} — ${context.reading.focus.label.toLowerCase()} — through the lens of "${context.reading.insight.label.toLowerCase()}."`,
+    `This ${context.reading.spread.name} was drawn for ${context.reading.domain.label.toLowerCase()}. The focus is ${context.reading.focus.label.toLowerCase()}, read through the lens of "${context.reading.insight.label.toLowerCase()}."`,
   ];
   if (topTheme) {
-    const gloss = topTheme.shortThesis.split("—")[1]?.trim();
-    openingParts.push(
-      `${topTheme.label} stands out across the spread${gloss ? ` — ${gloss}` : ""}.`,
-    );
+    openingParts.push(topTheme.shortThesis);
   }
   paragraphs.push({
     text: openingParts.join(" "),
@@ -34,7 +31,7 @@ export function renderDeterministicReading(context: ReadingContext): ReadingSynt
     const group = cards.slice(i, i + 2);
     const sentences = group.map(
       (c) =>
-        `${c.name}${c.orientation === "reversed" ? ", reversed," : ""} holds the "${c.positionLabel}" position (${c.positionPurpose.toLowerCase().replace(/\.$/, "")}). ${c.canonicalMeaningSummary}`,
+        `${c.name}${c.orientation === "reversed" ? ", reversed," : ""} holds the "${c.positionLabel}" position, ${c.positionPurpose.toLowerCase().replace(/\.$/, "")}. ${c.canonicalMeaningSummary}`,
     );
     paragraphs.push({
       text: sentences.join(" "),
@@ -55,7 +52,7 @@ export function renderDeterministicReading(context: ReadingContext): ReadingSynt
   const tension = context.tensions[0];
   if (tension) {
     paragraphs.push({
-      text: `The spread holds ${tension.themeA.toLowerCase()} and ${tension.themeB.toLowerCase()} at once. Neither cancels the other; the reading asks that both be given their place while the pattern develops.`,
+      text: `The spread holds ${tension.themeA.toLowerCase()} and ${tension.themeB.toLowerCase()} at the same time. Neither cancels the other. Give each its place while things develop.`,
       evidenceIds: [...tension.evidenceAIds, ...tension.evidenceBIds].slice(0, 4),
     });
   }
@@ -63,7 +60,7 @@ export function renderDeterministicReading(context: ReadingContext): ReadingSynt
   // Closing: symbolic frame left to the reader.
   const lastCard = cards[cards.length - 1]!;
   paragraphs.push({
-    text: `Taken together, the cards describe a pattern rather than a verdict. The position "${lastCard.positionLabel}" — carried here by ${lastCard.name} — marks where the symbolism currently points, and how it applies to your circumstances remains yours to weigh.`,
+    text: `Taken together, the cards describe a pattern, not a verdict. ${lastCard.name} in the "${lastCard.positionLabel}" position marks where things point right now. How that fits your life is yours to weigh.`,
     evidenceIds: [lastCard.evidenceId],
   });
 

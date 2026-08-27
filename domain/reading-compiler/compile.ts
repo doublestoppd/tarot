@@ -119,7 +119,7 @@ function personalFactors(
       factors.push({
         evidenceId: nextId(),
         type: "natal_stable_sign",
-        displayFact: `Natal ${BODY_LABELS[p.body] ?? p.body} in ${SIGN_LABELS[p.sign]} (stable for the full birth date)`,
+        displayFact: `${BODY_LABELS[p.body] ?? p.body} in ${SIGN_LABELS[p.sign]} at birth (true for any birth time on that date)`,
         precision: "stable-sign",
         provenanceIds: ["src_astronomy_engine"],
       });
@@ -129,7 +129,7 @@ function personalFactors(
       factors.push({
         evidenceId: nextId(),
         type: "natal_position",
-        displayFact: `Natal ${BODY_LABELS[p.body] ?? p.body} in ${SIGN_LABELS[p.sign]}${p.retrograde ? " (retrograde)" : ""}`,
+        displayFact: `${BODY_LABELS[p.body] ?? p.body} in ${SIGN_LABELS[p.sign]} at birth${p.retrograde ? " (retrograde)" : ""}`,
         precision: "exact",
         provenanceIds: ["src_astronomy_engine"],
       });
@@ -137,7 +137,7 @@ function personalFactors(
     factors.push({
       evidenceId: nextId(),
       type: "natal_angles",
-      displayFact: `Ascendant in ${SIGN_LABELS[inputs.natal.chart.chartRulerSign]}; houses: ${inputs.natal.chart.houses.system === "placidus" ? "Placidus" : "Whole Sign"}`,
+      displayFact: `Rising sign ${SIGN_LABELS[inputs.natal.chart.chartRulerSign]}; houses: ${inputs.natal.chart.houses.system === "placidus" ? "Placidus" : "Whole Sign"}`,
       precision: "exact",
       provenanceIds: ["src_astronomy_engine"],
     });
@@ -194,11 +194,19 @@ function currentSkyFactors(inputs: CompilerInputs): CurrentSkyFactor[] {
       provenanceIds: ["src_astronomy_engine"],
     });
   }
+  const aspectQuality: Record<string, string> = {
+    conjunction: "side by side",
+    opposition: "directly across from each other",
+    trine: "at an easy angle",
+    square: "at a hard angle",
+    sextile: "at a friendly angle",
+    quincunx: "at an awkward angle",
+  };
   for (const aspect of sky.aspects.slice(0, 3)) {
     factors.push({
       evidenceId: nextId(),
       type: "sky_aspect",
-      displayFact: `${BODY_LABELS[aspect.a] ?? aspect.a} ${aspect.type} ${BODY_LABELS[aspect.b] ?? aspect.b} (orb ${aspect.orb.toFixed(1)}°)`,
+      displayFact: `${BODY_LABELS[aspect.a] ?? aspect.a} and ${BODY_LABELS[aspect.b] ?? aspect.b} ${aspectQuality[aspect.type] ?? aspect.type} (${aspect.type}, ${aspect.orb.toFixed(1)}° apart)`,
       relevance: 2,
       provenanceIds: ["src_astronomy_engine", "src_ptolemy_tetrabiblos"],
     });
@@ -225,13 +233,13 @@ function unavailableFactors(inputs: CompilerInputs): UnavailableFactor[] {
       factor: "natal_houses_angles",
       reasonCode: "NO_BIRTH_TIME",
       userFacingExplanation:
-        "Natal houses and Ascendant — birth time and birthplace were not provided.",
+        "Houses and rising sign were left out because birth time and birthplace were not given.",
     });
     for (const body of natal.profile.omittedBodies) {
       out.push({
         factor: `natal_${body}`,
         reasonCode: "SIGN_UNSTABLE_WITHOUT_TIME",
-        userFacingExplanation: `Natal ${BODY_LABELS[body] ?? body} — its sign changes during the possible hours of this birth date, so it is left open rather than guessed.`,
+        userFacingExplanation: `${BODY_LABELS[body] ?? body} at birth was left out. Its sign changes during the possible hours of this birth date, so the app does not guess.`,
       });
     }
   } else if (natal.kind === "exact" && natal.chart.houses.system === "whole_sign") {

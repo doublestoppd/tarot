@@ -4,6 +4,10 @@ import {
   resetCompilerForTests,
 } from "@/domain/reading-compiler/compile";
 import { validateSynthesis } from "@/domain/safety/validate";
+import {
+  fleschKincaidGrade,
+  MAX_USER_FACING_GRADE,
+} from "@/domain/safety/readability";
 import type { ReadingSynthesizer } from "@/domain/reading-compiler/synthesizer";
 import { FakeReadingSynthesizer } from "@/lib/openai/fake";
 
@@ -23,6 +27,7 @@ interface EvalRecord {
   fatal: string[];
   repairable: string[];
   words: number;
+  grade: number;
   text: string;
 }
 
@@ -75,6 +80,7 @@ async function main(): Promise<void> {
           .filter((p) => p.severity === "repairable")
           .map((p) => `${p.code}:${p.detail}`),
         words: text.split(/\s+/).filter(Boolean).length,
+        grade: fleschKincaidGrade(text).grade,
         text,
       });
     } catch (error) {
@@ -84,6 +90,7 @@ async function main(): Promise<void> {
         fatal: [`PROVIDER_ERROR:${String((error as Error).message).slice(0, 80)}`],
         repairable: [],
         words: 0,
+        grade: 0,
         text: "",
       });
     }
@@ -110,12 +117,24 @@ async function main(): Promise<void> {
   const failed = records.filter((r) => !r.ok);
   const fatalFailed = records.filter((r) => r.fatal.length > 0);
 
+  // Plain-language metric (ADR 0009): grade of every synthesized reading.
+  const graded = records.filter((r) => r.text.length > 0);
+  const avgGrade =
+    graded.reduce((sum, r) => sum + r.grade, 0) / Math.max(graded.length, 1);
+  const maxGrade = graded.reduce((max, r) => Math.max(max, r.grade), 0);
+  const aboveCeiling = graded.filter((r) => r.grade > MAX_USER_FACING_GRADE);
+
   console.log("┌─ Results ─────────────────────────────────────────");
   console.log(`│ fixtures:            ${records.length}`);
   console.log(`│ fully valid:         ${records.length - failed.length}`);
   console.log(`│ with fatal problems: ${fatalFailed.length}`);
   console.log(`│ swap-test failures:  ${swapFailures.length}`);
+  console.log(`│ reading grade:       avg ${avgGrade.toFixed(1)}, max ${maxGrade.toFixed(1)} (ceiling ${MAX_USER_FACING_GRADE})`);
+  console.log(`│ above grade ceiling: ${aboveCeiling.length}`);
   console.log("└───────────────────────────────────────────────────");
+  for (const record of aboveCeiling.slice(0, 10)) {
+    console.log(`  GRADE ${record.id}: ${record.grade}`);
+  }
 
   for (const record of fatalFailed.slice(0, 20)) {
     console.log(`  FATAL ${record.id}: ${record.fatal.join("; ")}`);

@@ -8,33 +8,33 @@ export default function TermsPage() {
       </span>
       <h1>Terms of use</h1>
       <p>
-        This is a private, invitation-only application offered as-is for
+        This is a private, invitation-only app. It is offered as-is, for
         personal, reflective use by people who were given its access code.
       </p>
       <h2>Readings are interpretive</h2>
       <p>
-        Readings are symbolic interpretation, not fact, prediction, or
-        professional advice. They must not be relied on for medical, mental
-        health, legal, financial, or other high-stakes decisions, and the
-        application deliberately declines to produce such directives. You
-        remain responsible for your decisions.
+        Readings are symbolic interpretation. They are not fact, prediction,
+        or professional advice. Do not rely on them for medical, mental
+        health, legal, money, or other high-stakes choices. The app refuses
+        to give that kind of directive on purpose. Your decisions stay your
+        own.
       </p>
       <h2>Access</h2>
       <p>
-        Please do not share the access code beyond the people it was given to.
+        Please do not pass the access code beyond the people it was given to.
         Access may be rotated or withdrawn at any time. Automated or abusive
-        use may be throttled without notice.
+        use may be slowed or blocked without notice.
       </p>
       <h2>Share links</h2>
       <p>
-        Private share links carry the decryption key in the link itself: treat
-        a link as the content it unlocks, share it only with people you would
-        show the reading to, and expect it to expire.
+        A private share link carries its own unlock key. Treat the link as
+        the content it unlocks. Share it only with people you would show the
+        reading to, and expect it to expire.
       </p>
       <h2>No warranty</h2>
       <p>
-        The service is provided without warranty of any kind. It may be
-        modified, interrupted, or discontinued at any time.
+        The service comes with no warranty of any kind. It may change, pause,
+        or shut down at any time.
       </p>
     </main>
   );

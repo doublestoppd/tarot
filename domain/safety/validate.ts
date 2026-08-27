@@ -3,6 +3,10 @@ import type {
   ReadingSynthesis,
 } from "@/domain/reading-compiler/types";
 import { DEPTH_TARGETS } from "@/domain/reading-compiler/types";
+import {
+  fleschKincaidGrade,
+  MAX_USER_FACING_GRADE,
+} from "./readability";
 
 /**
  * Deterministic post-generation validation (spec §17.1). The model's own
@@ -226,6 +230,17 @@ export function validateSynthesis(
     });
   }
 
+  // Plain-language rule (ADR 0009): user-facing prose reads at or below an
+  // 8th-grade level, scored with esoteric names normalized out.
+  const readability = fleschKincaidGrade(fullText);
+  if (readability.grade > MAX_USER_FACING_GRADE) {
+    problems.push({
+      code: "READING_LEVEL_TOO_HIGH",
+      severity: "repairable",
+      detail: `grade ${readability.grade} > ${MAX_USER_FACING_GRADE}`,
+    });
+  }
+
   // Prohibited language classes.
   for (const hit of scanPatterns(fullText, TECHNICAL_LANGUAGE)) {
     problems.push({ code: "TECHNICAL_LANGUAGE", severity: "repairable", detail: hit });
@@ -330,9 +345,16 @@ export function repairInstruction(problems: ValidationProblem[]): string {
     .filter((p) => p.severity !== "minor")
     .map((p) => `- ${p.code}: ${p.detail}`)
     .slice(0, 12);
+  const extras: string[] = [];
+  if (problems.some((p) => p.code === "READING_LEVEL_TOO_HIGH")) {
+    extras.push(
+      "Rewrite in plainer language: short sentences (most under 18 words), common words, one idea per sentence. Keep the card, sign, and planet names.",
+    );
+  }
   return [
     "Your previous output violated the reading contract. Rewrite it using the same evidence and the same JSON schema, correcting exactly these problems:",
     ...lines,
+    ...extras,
     "Do not introduce new evidence ids, new correspondences, or new personal facts.",
   ].join("\n");
 }

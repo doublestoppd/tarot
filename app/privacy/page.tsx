@@ -1,6 +1,6 @@
 export const metadata = { title: "Privacy — Arcanum" };
 
-/** Privacy disclosures (spec §48.2). */
+/** Privacy disclosures (spec §48.2), in plain language (ADR 0009). */
 export default function PrivacyPage() {
   return (
     <main>
@@ -12,62 +12,58 @@ export default function PrivacyPage() {
       <h2>No account, no profile</h2>
       <p>
         This is a private, invitation-only space. There are no accounts, no
-        usernames, and no personal profiles. Entering the shared access code
-        places an anonymous authorization credential in your browser; it
-        contains no name, email, birth information, or reading history.
+        usernames, and no profiles. When you enter the shared access code,
+        your browser receives an anonymous pass. That pass holds no name, no
+        email, no birth facts, and no reading history.
       </p>
 
-      <h2>Readings are ephemeral</h2>
+      <h2>Readings are not stored</h2>
       <p>
-        Birth information you optionally enter, and the full calculation
-        context derived from it, are used only to prepare the active reading.
-        They live inside an encrypted, short-lived reading ticket held by your
-        browser and are not stored as reading history by the application.
-        Closing or refreshing the page ends the reading. The application keeps
-        no record of which cards you drew or what your reading said.
+        Birth facts you choose to enter are used only to prepare the current
+        reading. They travel inside an encrypted, short-lived reading ticket
+        that your browser holds. The app does not store them as history.
+        Closing or refreshing the page ends the reading. The app keeps no
+        record of which cards you drew or what your reading said.
       </p>
 
-      <h2>What the application does retain</h2>
+      <h2>What the app does keep</h2>
       <p>
-        Operating a shared private service requires minimal operational data:
-        the anonymous authorization credential, short-lived anonymized
-        rate-limit counters, and aggregate cost/health counters (counts,
-        token totals, error rates). None of it contains reading content or
-        birth information.
+        Running a shared private service takes a small amount of operating
+        data: the anonymous pass, short-lived anonymous rate-limit counters,
+        and overall cost and health totals (counts, token totals, error
+        rates). None of it contains reading content or birth facts.
       </p>
 
       <h2>The interpretation provider</h2>
       <p>
-        Generating the full written interpretation requires transmitting a
-        minimized, derived symbolic context — never your raw birth date, time,
-        or birthplace — to our AI provider (OpenAI's API). Per OpenAI's
-        current API data controls, API data is not used to train models unless
-        the customer opts in (we do not), and standard abuse-monitoring
-        retention of up to about 30 days may apply on the provider's side. We
-        do not claim zero provider retention unless that configuration is
-        actually approved and in place. Provider terms can change; this page
-        is reviewed against the provider's current documentation at each
-        deployment.
+        Writing the full interpretation means sending a trimmed, derived
+        summary of the symbols — never your raw birth date, time, or
+        birthplace — to our AI provider (OpenAI&apos;s API). Under
+        OpenAI&apos;s current API terms, API data is not used to train models
+        unless the customer opts in, and we do not. The provider may keep
+        data for up to about 30 days to watch for abuse. We do not claim zero
+        provider retention unless that setup is truly approved and in place.
+        Provider terms can change. This page is checked against the
+        provider&apos;s current documents at each deployment.
       </p>
 
       <h2>Private share links</h2>
       <p>
-        A reading is saved only if you explicitly create a private share link.
-        Your browser then encrypts a minimized copy of the finished reading
-        (title, text, cards, general topic, date — never birth details or the
-        underlying calculation basis) and the server stores only that
-        encrypted data. The decryption key lives in the link itself, after the
-        “#”, and is never sent to the server. Links expire automatically,
+        A reading is saved only if you choose to create a private share link.
+        Your browser then encrypts a trimmed copy of the finished reading:
+        title, text, cards, general topic, and date. Birth details and the
+        calculation basis are never included. The server stores only the
+        encrypted data. The unlock key lives in the link itself, after the
+        “#”, and is never sent to the server. Links expire on their own,
         after 90 days by default. Encrypted share data deleted from the live
-        database may persist in infrastructure backups until those backups age
-        out.
+        database may live on in backups until those backups age out.
       </p>
 
       <h2>No tracking</h2>
       <p>
-        There is no advertising, no behavioral analytics, no session replay,
-        and no third-party trackers. Server logs never contain reading
-        content, birth information, access codes, or request bodies.
+        There is no advertising, no behavior tracking, no session replay, and
+        no third-party trackers. Server logs never contain reading content,
+        birth facts, access codes, or request bodies.
       </p>
     </main>
   );

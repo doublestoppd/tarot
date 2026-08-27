@@ -153,8 +153,8 @@ export function SharedReading({ shareId }: { shareId: string }) {
       </article>
 
       <p className="basis-line">
-        Shared privately. Personal information used to create this reading is
-        not included in the saved reading artifact.
+        Shared privately. Personal details used to create this reading are
+        not part of this saved copy.
       </p>
     </main>
   );

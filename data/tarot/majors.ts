@@ -5,6 +5,9 @@ import type { TarotCardDefinition } from "@/domain/tarot/types";
  * Structural/divinatory foundation: Rider–Waite–Smith tradition
  * (src_waite_pkt_1911); elemental/zodiacal/planetary attributions surface in
  * the correspondence graph, not here.
+ *
+ * Meaning prose follows the plain-language rule (ADR 0009): short sentences,
+ * common words, at or below an 8th-grade reading level.
  */
 
 const SRC = ["src_waite_pkt_1911", "src_book_t_1893"];
@@ -20,9 +23,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: "air",
     coreKeywords: ["beginnings", "openness", "trust", "risk", "threshold"],
     uprightMeaning:
-      "A step taken before the path is fully visible: openness, unformed potential, and the willingness to begin without guarantees.",
+      "A first step onto a path you cannot fully see yet. The heart is open and nothing is settled. That freedom is the gift here.",
     reversedMeaning:
-      "Hesitation at the threshold, or a leap taken carelessly — enthusiasm without footing, or freedom postponed by fear of the first step.",
+      "Standing frozen at the edge, or leaping without looking. The wish to begin is real. The footing is not there yet.",
     numerologyNumber: 0,
     themeTags: ["beginnings", "freedom", "risk", "movement", "hope"],
     tensionTags: ["beginning", "expansion", "outward"],
@@ -38,9 +41,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["skill", "focus", "agency", "initiative", "channeling"],
     uprightMeaning:
-      "Available means gathered to a single point of intent: skill, timing, and the capacity to turn an idea into a first concrete act.",
+      "You have the tools, and now they point one way. Skill and timing come together. An idea is ready to become a first real act.",
     reversedMeaning:
-      "Scattered will, or talent used to persuade rather than build; capability present but not yet honestly directed.",
+      "Energy scattered in too many directions. Or talent used to impress instead of build. The will needs an honest aim.",
     numerologyNumber: 1,
     themeTags: ["action", "clarity", "communication", "power", "beginnings"],
     tensionTags: ["outward", "beginning"],
@@ -56,9 +59,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["interiority", "stillness", "latency", "intuition", "reserve"],
     uprightMeaning:
-      "Knowledge held in reserve: the value of stillness, receptivity, and what is understood before it can be explained.",
+      "Some knowing sits quietly inside and is not ready to be said. Stillness is doing real work here. Listen before you explain.",
     reversedMeaning:
-      "An inner signal ignored, or secrets kept past their usefulness; the need to stop consulting others and listen inward.",
+      "An inner voice is being ignored. Or a secret is kept past its use. Stop asking around and listen inward.",
     numerologyNumber: 2,
     themeTags: ["intuition", "mystery", "solitude", "insight", "waiting"],
     tensionTags: ["inward"],
@@ -74,9 +77,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["growth", "nurture", "fertility", "embodiment", "abundance"],
     uprightMeaning:
-      "Growth by nourishment rather than force: material and creative abundance developing at a living pace.",
+      "Growth that comes from care, not force. Things ripen at their own living pace. There is plenty here, and more coming.",
     reversedMeaning:
-      "Care that smothers or neglects itself; creative ground left fallow, or comfort mistaken for growth.",
+      "Care that smothers, or care that skips itself. Good ground sits unused. Comfort is being mistaken for growth.",
     numerologyNumber: 3,
     themeTags: ["growth", "abundance", "emotional", "harmony", "material"],
     tensionTags: ["expansion"],
@@ -92,9 +95,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["structure", "authority", "order", "boundaries", "stewardship"],
     uprightMeaning:
-      "Order made deliberately: boundaries, responsibility, and authority exercised to protect what is being built.",
+      "Order built on purpose. Rules and limits protect the thing being made. Someone has to hold the frame, and here it holds.",
     reversedMeaning:
-      "Structure hardened into rigidity, or authority avoided; control standing in for security.",
+      "Structure gone stiff, or leadership dodged. Control is standing in for real safety. The frame needs to bend a little.",
     numerologyNumber: 4,
     themeTags: ["structure", "authority", "stability", "discipline", "power"],
     tensionTags: ["restriction", "holding_on"],
@@ -110,9 +113,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["tradition", "teaching", "transmission", "belonging", "convention"],
     uprightMeaning:
-      "Learning through an established form — teachers, lineages, shared practice — and the steadiness of belonging to something older than the moment.",
+      "Learning through a tradition older than you. Teachers, practice, and shared rules give steady ground. Belonging has its own strength.",
     reversedMeaning:
-      "Convention outgrown, or authority accepted without examination; the search for a form that actually fits.",
+      "A tradition you have outgrown. Or rules followed without asking why. It may be time to find a form that truly fits.",
     numerologyNumber: 5,
     themeTags: ["structure", "connection", "discipline", "stability", "truth"],
     tensionTags: ["restriction", "holding_on"],
@@ -128,9 +131,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["choice", "union", "alignment", "values", "attraction"],
     uprightMeaning:
-      "A meaningful joining and the choice that defines it: alignment between desire and values rather than attraction alone.",
+      "A real joining, and the choice that seals it. What you want and what you value line up. That match matters more than charm.",
     reversedMeaning:
-      "Misalignment between what is wanted and what is chosen; a decision deferred, or a union tested by divided values.",
+      "Wanting one thing and choosing another. A decision keeps being put off. Shared values need an honest look.",
     numerologyNumber: 6,
     themeTags: ["connection", "choice", "harmony", "truth", "emotional"],
     tensionTags: ["outward"],
@@ -146,9 +149,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["momentum", "will", "direction", "containment", "victory"],
     uprightMeaning:
-      "Momentum achieved by holding opposing pulls under one direction: disciplined will moving something forward.",
+      "Two pulls held under one steady hand. That is how this motion works. Will and focus are carrying something forward.",
     reversedMeaning:
-      "Drive without steering, or motion stalled by internal contradiction; the vehicle needs re-alignment before speed.",
+      "Speed without steering, or a stall from inner tug-of-war. Line the wheels up first. Then ask for speed.",
     numerologyNumber: 7,
     themeTags: ["movement", "action", "power", "discipline", "conflict"],
     tensionTags: ["outward", "expansion"],
@@ -164,9 +167,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["courage", "patience", "gentleness", "mastery", "endurance"],
     uprightMeaning:
-      "Force met with composure: strength expressed as patience, gentleness, and steadiness with what is instinctive.",
+      "Power shown as patience. The wild part is met with a calm, kind grip. That hold is stronger than force.",
     reversedMeaning:
-      "Self-doubt, or force applied where patience was needed; the instinctive current runs stronger than its current handling.",
+      "Doubt in your own strength, or force used where patience was needed. The instinct is strong. The handling needs care.",
     numerologyNumber: 8,
     themeTags: ["power", "discipline", "harmony", "healing", "vulnerability"],
     tensionTags: ["inward"],
@@ -182,9 +185,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["withdrawal", "discernment", "refinement", "search", "guidance"],
     uprightMeaning:
-      "Deliberate withdrawal in order to see clearly: refinement of purpose through solitude, discernment, and patient searching.",
+      "A choice to step back and see clearly. Time alone sorts what matters from what does not. The search is slow and honest.",
     reversedMeaning:
-      "Isolation past its purpose, or counsel refused; solitude protecting against the very thing it was meant to clarify.",
+      "Alone too long, or advice pushed away. The quiet has stopped helping. It now hides what it was meant to show.",
     numerologyNumber: 9,
     themeTags: ["solitude", "insight", "clarity", "discipline", "waiting"],
     tensionTags: ["inward"],
@@ -200,9 +203,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["turning", "cycles", "timing", "fortune", "change"],
     uprightMeaning:
-      "A turning point moved by forces larger than preference: cycles, timing, and circumstances rearranging the board.",
+      "The wheel turns on its own schedule. Luck, timing, and larger currents are moving the board. A turn is underway.",
     reversedMeaning:
-      "Resistance to a turn already underway; a cycle repeating until its lesson is carried forward.",
+      "Pushing against a turn already happening. The same loop keeps coming back. It repeats until its lesson travels with you.",
     numerologyNumber: 10,
     themeTags: ["cycles", "change", "movement", "risk", "hope"],
     tensionTags: ["expansion"],
@@ -218,9 +221,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["equity", "consequence", "truth", "adjustment", "accountability"],
     uprightMeaning:
-      "Cause meeting consequence: clear seeing, accountability, and the precise adjustment that restores balance.",
+      "Cause meets effect here. Clear eyes, fair weighing, and the small correction that sets things level again.",
     reversedMeaning:
-      "An unbalanced account — unfairness, avoidance of consequence, or self-judgment out of proportion to the facts.",
+      "The scales are off. Something unfair stands uncorrected. Or you judge yourself harder than the facts do.",
     numerologyNumber: 11,
     themeTags: ["justice", "truth", "balance", "clarity", "structure"],
     tensionTags: ["restriction"],
@@ -236,9 +239,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: "water",
     coreKeywords: ["suspension", "surrender", "reversal", "pause", "sacrifice"],
     uprightMeaning:
-      "Progress through suspension: a deliberate pause, a reversed vantage, and what becomes visible only when striving stops.",
+      "Progress through pausing. Hang here a moment and the view flips. What striving hid, stillness shows.",
     reversedMeaning:
-      "Stalling disguised as surrender, or sacrifice without meaning; the pause has ripened and asks for release.",
+      "A pause that has become a stall. Or a sacrifice with no meaning left. The waiting is ripe. Let it end.",
     numerologyNumber: 12,
     themeTags: ["surrender", "waiting", "insight", "restraint", "vulnerability"],
     tensionTags: ["inward", "letting_go"],
@@ -254,9 +257,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["ending", "transformation", "release", "clearing", "irreversibility"],
     uprightMeaning:
-      "A definitive ending that clears the ground: transformation through release rather than repair.",
+      "A true ending, and the clearing it leaves. This is change by release, not repair. Ground is being made ready.",
     reversedMeaning:
-      "An ending resisted; stagnation from carrying what is already finished.",
+      "An ending held off. Carrying what is already finished has gone heavy. Set it down so change can move.",
     numerologyNumber: 13,
     themeTags: ["endings", "transformation", "release", "change", "loss"],
     tensionTags: ["ending", "letting_go"],
@@ -272,9 +275,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["blending", "calibration", "moderation", "patience", "synthesis"],
     uprightMeaning:
-      "Active equilibrium: opposite currents blended by patient adjustment into something workable and alive.",
+      "Two opposite streams blended with patience. A little of this, a little of that, tested and adjusted. It comes out alive and workable.",
     reversedMeaning:
-      "A mixture out of proportion — excess, impatience, or elements that will not yet combine.",
+      "The mix is off. Too much of one thing, too little of another. Some parts are not ready to combine yet.",
     numerologyNumber: 14,
     themeTags: ["balance", "harmony", "healing", "discipline", "renewal"],
     tensionTags: [],
@@ -290,9 +293,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["attachment", "compulsion", "materiality", "bondage", "shadow"],
     uprightMeaning:
-      "A binding examined: attachment, compulsion, or an arrangement kept for its comfort at the cost of freedom.",
+      "A chain worth looking at. Comfort, habit, or appetite holds the key to its own lock. Naming the bind starts to loosen it.",
     reversedMeaning:
-      "Chains loosening: the beginning of disentanglement from what has held appetite or fear in charge.",
+      "The chain is loosening. A habit or fear is losing its grip. Freedom starts small and grows.",
     numerologyNumber: 15,
     themeTags: ["restraint", "power", "excess", "fear", "material"],
     tensionTags: ["holding_on", "restriction"],
@@ -308,9 +311,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["rupture", "collapse", "revelation", "release", "disillusion"],
     uprightMeaning:
-      "A sudden structural break that tells the truth: what was built on a flaw comes down so something honest can stand.",
+      "A sudden break that tells the truth. What stood on a flaw comes down. Now something honest can be built.",
     reversedMeaning:
-      "Collapse resisted or contained — a slower dismantling, or the aftershocks of a rupture already past.",
+      "A collapse held back, or one already past. The break comes slower, in pieces. The aftershocks still need care.",
     numerologyNumber: 16,
     themeTags: ["change", "endings", "truth", "loss", "release"],
     tensionTags: ["ending", "letting_go"],
@@ -326,9 +329,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["renewal", "clarity", "hope", "replenishment", "orientation"],
     uprightMeaning:
-      "Quiet replenishment after upheaval: a distant fixed point that restores orientation, honesty, and hope.",
+      "Quiet refilling after a hard stretch. One steady light gives back your bearings. Hope here is calm and real.",
     reversedMeaning:
-      "Faith at low water: disconnection from the source that renews, and the need to refill before navigating onward.",
+      "The well is low and the light feels far away. Refill first. Then find your heading.",
     numerologyNumber: 17,
     themeTags: ["hope", "renewal", "healing", "clarity", "harmony"],
     tensionTags: [],
@@ -344,9 +347,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["uncertainty", "imagination", "instinct", "distortion", "night"],
     uprightMeaning:
-      "A passage through uncertain light: instinct, imagination, and fears that distort scale; the path continues though it cannot be fully seen.",
+      "A path walked by moonlight. Shapes shift and fears look bigger than they are. Keep walking. The road is still there.",
     reversedMeaning:
-      "Fog beginning to lift, or anxiety mistaken for insight; impressions want testing against ground.",
+      "The fog is starting to lift. Check dark guesses against plain facts. Not every shadow was true.",
     numerologyNumber: 18,
     themeTags: ["mystery", "illusion", "intuition", "fear", "emotional"],
     tensionTags: ["inward"],
@@ -362,9 +365,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["vitality", "clarity", "warmth", "success", "visibility"],
     uprightMeaning:
-      "Unambiguous vitality: clarity, warmth, and growth that can afford to be seen.",
+      "Clear light and easy warmth. What grows here can afford to be seen. This is plain, healthy vitality.",
     reversedMeaning:
-      "Light dimmed by doubt or delay: genuine vitality present but underexpressed.",
+      "The light is real but dimmed. Doubt or delay sits in front of it. Let what is good be seen.",
     numerologyNumber: 19,
     themeTags: ["clarity", "growth", "hope", "action", "harmony"],
     tensionTags: ["outward", "expansion"],
@@ -380,9 +383,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: "fire",
     coreKeywords: ["reckoning", "awakening", "summons", "evaluation", "rebirth"],
     uprightMeaning:
-      "A summons to rise from an old chapter: honest reckoning, forgiveness of the past account, and an unmistakable answer to a call.",
+      "A call to rise from an old chapter. Settle the old account honestly and answer it. This kind of waking does not undo itself.",
     reversedMeaning:
-      "The call heard but deferred; self-judgment that closes the case too harshly or too soon.",
+      "The call has come, but the answer waits. Or self-judging closed the case too hard. Reopen it gently.",
     numerologyNumber: 20,
     themeTags: ["renewal", "transformation", "truth", "endings", "beginnings"],
     tensionTags: ["ending", "beginning"],
@@ -398,9 +401,9 @@ export const MAJOR_CARDS: TarotCardDefinition[] = [
     element: null,
     coreKeywords: ["completion", "integration", "wholeness", "culmination", "arrival"],
     uprightMeaning:
-      "A cycle completed and integrated: the wholeness that comes when every corner of an effort is honored, and the poised moment before the next round.",
+      "A circle completed. Every corner of the effort got its honor, and it shows. Rest a beat before the next round.",
     reversedMeaning:
-      "Completion delayed by a missing piece; the last honest step of closure still to be taken.",
+      "Almost done, but not done. One honest closing step remains. Take it, and the circle seals.",
     numerologyNumber: 21,
     themeTags: ["completion", "cycles", "harmony", "stability", "structure"],
     tensionTags: ["ending"],

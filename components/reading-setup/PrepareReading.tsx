@@ -313,8 +313,8 @@ export function PrepareReading() {
           <span className="optional-tag">Optional</span>
           <h2 id="step-personal">Personalize your reading</h2>
           <p style={{ color: "var(--text-dim)", fontSize: "0.92rem" }}>
-            You can leave this entire section blank. Birth information allows
-            additional astrological, numerical, and tarot correspondences.
+            You can leave this whole section blank. Birth facts let the
+            reading add links from astrology, numbers, and tarot birth cards.
           </p>
           <label className="label" htmlFor="birth-date">
             Birth date
@@ -421,7 +421,7 @@ export function PrepareReading() {
                 </div>
               </div>
               <p style={{ color: "var(--text-faint)", fontSize: "0.8rem", marginTop: "0.5rem" }}>
-                Adding both allows houses, angles and a more complete natal chart.
+                Adding both unlocks houses, angles, and a fuller birth chart.
               </p>
               <button
                 type="button"
