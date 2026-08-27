@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Content validation
+        run: npm run validate-content
+
+      - name: Unit + integration tests (disposable PostgreSQL)
+        run: npm test
+
+      - name: AI evaluation harness (deterministic adapter)
+        run: npm run test:ai-evals
+
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Install Playwright chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: E2E smoke against the production build
+        run: |
+          npx tsx scripts/dev-stack.ts .dev-stack.env &
+          for i in $(seq 1 30); do [ -f .dev-stack.env ] && break; sleep 1; done
+          set -a; source .dev-stack.env; set +a
+          npx next start -p 3100 &
+          for i in $(seq 1 30); do curl -fsS http://localhost:3100/api/health && break; sleep 1; done
+          E2E_BASE_URL=http://localhost:3100 E2E_ACCESS_CODE=TEST-ACCESS-CODE npm run test:e2e

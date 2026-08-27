@@ -11,12 +11,14 @@ type Level = "debug" | "info" | "warn" | "error";
 const LEVEL_RANK: Record<Level, number> = { debug: 0, info: 1, warn: 2, error: 3 };
 
 const SENSITIVE_KEY_PATTERN =
-  /(code|token|secret|birth|card|prompt|cookie|authorization|ticket|password|key|body|prose|paragraph|place|query|q)/i;
+  /(code|token|secret|birth|card|prompt|cookie|authorization|ticket|password|key|body|prose|paragraph|place|quer)/i;
+/** Keys that are sensitive only as exact names (substrings too common). */
+const SENSITIVE_EXACT_KEYS = new Set(["q", "ip", "address"]);
 
 export function scrubMeta(meta: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(meta)) {
-    if (SENSITIVE_KEY_PATTERN.test(key)) {
+    if (SENSITIVE_EXACT_KEYS.has(key.toLowerCase()) || SENSITIVE_KEY_PATTERN.test(key)) {
       out[key] = "[scrubbed]";
     } else if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       out[key] = scrubMeta(value as Record<string, unknown>);
