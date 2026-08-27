@@ -32,7 +32,8 @@ export function microToUsdString(micro: number): string {
     .toString()
     .padStart(6, "0")
     .replace(/0+$/, "");
-  return frac.length > 0 ? `${whole}.${frac}` : `${whole}.00`;
+  if (frac.length === 0) return `${whole}.00`;
+  return `${whole}.${frac.padEnd(2, "0")}`;
 }
 
 const usdString = z

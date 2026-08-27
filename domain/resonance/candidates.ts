@@ -152,7 +152,9 @@ export function cardEvidence(
     const position = spread.positions[drawn.drawIndex]!;
     const meaning =
       drawn.orientation === "upright" ? card.uprightMeaning : card.reversedMeaning;
-    let base = 8;
+    // Cards are the reading: the base keeps every card observation at least
+    // in the "supporting" band before bonuses (spec §15.2 hierarchy).
+    let base = 9;
     if (position.emphasis === "primary") base += 2;
     if (position.insightAffinity.includes(selections.insightId)) base += 4;
     if (drawn.orientation === "reversed" && selections.insightId === "not_obvious") {

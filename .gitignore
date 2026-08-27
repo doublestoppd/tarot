@@ -26,3 +26,7 @@ data/places/generated/
 # logs and OS noise
 *.log
 .DS_Store
+
+# playwright
+test-results/
+.dev-stack.env

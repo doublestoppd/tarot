@@ -256,7 +256,11 @@ const CATEGORY_PROVENANCE_LABEL: Record<string, string> = {
 
 function providerEvidence(selected: EvidenceNode[]): ProviderEvidenceItem[] {
   return selected
-    .filter((n) => n.significanceBand !== "ignore" && n.significanceBand !== "background")
+    .filter(
+      (n) =>
+        n.category === "tarot_card" ||
+        (n.significanceBand !== "ignore" && n.significanceBand !== "background"),
+    )
     .map((n) => ({
       id: n.id,
       statement: n.statement,

@@ -175,7 +175,12 @@ function collapseLineage(nodes: EvidenceNode[]): void {
 }
 
 function applyCaps(nodes: EvidenceNode[]): EvidenceNode[] {
-  const active = nodes.filter((n) => n.active && n.significanceBand !== "ignore");
+  // Card observations are exempt from band filtering — the cards are the
+  // reading (their count is still bounded by the tarot_card category cap).
+  const active = nodes.filter(
+    (n) =>
+      n.active && (n.category === "tarot_card" || n.significanceBand !== "ignore"),
+  );
 
   // Background evidence survives only when it supports a stronger node's
   // concepts (spec §13.3).
@@ -187,6 +192,7 @@ function applyCaps(nodes: EvidenceNode[]): EvidenceNode[] {
   }
   const eligible = active.filter(
     (n) =>
+      n.category === "tarot_card" ||
       n.significanceBand !== "background" ||
       n.conceptIds.some((c) => strongConcepts.has(c)),
   );

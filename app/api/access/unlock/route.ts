@@ -39,9 +39,11 @@ export const POST = withRoute("access/unlock", async (request: NextRequest): Pro
   const pool = getPool();
   const env = getEnv();
 
+  // Backoff throttling far below meaningful brute-force throughput against a
+  // 160-bit code (spec §21.4), while tolerating legitimate multi-device use.
   const ipKey = requestIpKey(request);
-  const perIp = await checkAndIncrement(pool, ipKey, "unlock_ip", 600, 8);
-  const global = await checkAndIncrement(pool, "global", "unlock_global", 600, 120);
+  const perIp = await checkAndIncrement(pool, ipKey, "unlock_ip", 600, 30);
+  const global = await checkAndIncrement(pool, "global", "unlock_global", 600, 200);
   if (!perIp.allowed || !global.allowed) {
     return apiError("RATE_TEMPORARILY_UNAVAILABLE");
   }
