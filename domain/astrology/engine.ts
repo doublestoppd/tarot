@@ -232,6 +232,19 @@ function stabilityProfile(
   };
 }
 
+/**
+ * Stability profile over an arbitrary UTC interval — used for the
+ * ambiguous-DST "not sure" case (spec §10.4): both possible instants are
+ * covered and any factor that differs between them is suppressed.
+ */
+export function computePartialBetween(
+  start: Date,
+  end: Date,
+  kind: PartialNatalProfile["kind"],
+): PartialNatalProfile {
+  return stabilityProfile(kind, start, end);
+}
+
 export function computeConservativeDateOnly(
   year: number,
   month: number,

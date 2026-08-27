@@ -66,6 +66,7 @@ suite("database integration (disposable PostgreSQL cluster)", () => {
         "app_settings",
         "budget_reservations",
         "budget_state",
+        "places",
         "rate_limit_buckets",
         "schema_migrations",
         "share_artifacts",
