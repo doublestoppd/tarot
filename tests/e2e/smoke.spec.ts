@@ -76,7 +76,7 @@ test("encrypted share: create, open in a fresh browser through the gate, decrypt
   await freshPage.waitForSelector("text=A shared reading", { timeout: 20_000 });
   await expect(freshPage.locator(".prose-reading p").first()).toBeVisible();
   await expect(
-    freshPage.getByText("Personal information used to create this reading"),
+    freshPage.getByText("Personal details used to create this reading"),
   ).toBeVisible();
   await fresh.close();
 });
