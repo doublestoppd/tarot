@@ -1,0 +1,47 @@
+{
+  "name": "private-tarot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private esoteric tarot reading application — deterministic symbolic engines with a single-call AI synthesis layer.",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "RUN_DB_TESTS=1 vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:ai-evals": "tsx scripts/run-ai-evals.ts",
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "db:seed-reference": "tsx scripts/db-seed-reference.ts",
+    "validate-content": "tsx scripts/validate-content.ts",
+    "admin:generate-access-code": "tsx scripts/generate-access-code.ts",
+    "admin:generate-admin-secret": "tsx scripts/generate-admin-secret.ts",
+    "import-places": "tsx scripts/import-places.ts"
+  },
+  "dependencies": {
+    "argon2": "^0.45.1",
+    "astronomy-engine": "^2.1.19",
+    "drizzle-orm": "^0.45.2",
+    "next": "^16.3.3",
+    "openai": "^7.7.0",
+    "pg": "^8.16.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.15.5",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.11"
+  }
+}
