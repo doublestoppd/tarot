@@ -141,19 +141,29 @@ function whatShaped(context: ReadingContext): WhatShapedLayer {
 function detailedBasis(context: ReadingContext): DetailedBasisRow[] {
   const rows: DetailedBasisRow[] = [];
   const seen = new Set<string>();
-  const allNodes = [
-    ...context.providerEvidence.map((e) => ({
+  // Provenance-carrying evidence nodes come first so the dedupe below keeps
+  // the enriched row; provider-evidence entries fill in anything remaining
+  // (notably card observations, grounded in the card's own source refs).
+  const allNodes: Array<{
+    statement: string;
+    category: string;
+    provenanceIds: string[];
+  }> = [...context.tarotPatterns, ...context.resonances].map((node) => ({
+    statement: node.statement,
+    category: node.category,
+    provenanceIds: node.provenanceIds,
+  }));
+  const cardProvenance = new Map(
+    context.reading.cards.map((c) => [c.evidenceId, c.cardId]),
+  );
+  for (const e of context.providerEvidence) {
+    allNodes.push({
       statement: e.statement,
       category: e.category,
-      provenanceIds: [] as string[],
-    })),
-  ];
-  // Enrich from the full evidence nodes where provenance ids exist.
-  for (const node of [...context.tarotPatterns, ...context.resonances]) {
-    allNodes.push({
-      statement: node.statement,
-      category: node.category,
-      provenanceIds: node.provenanceIds,
+      provenanceIds:
+        e.category === "tarot_card" && cardProvenance.has(e.id)
+          ? ["src_waite_pkt_1911"]
+          : [],
     });
   }
   for (const node of allNodes) {
@@ -170,6 +180,10 @@ function detailedBasis(context: ReadingContext): DetailedBasisRow[] {
         for (const ref of record.sourceRefs) sources.add(sourceTitle(ref));
       } else if (provenanceId.startsWith("src_")) {
         sources.add(sourceTitle(provenanceId));
+        const source = SOURCES.find((s) => s.id === provenanceId);
+        if (tradition === "—" && source && source.tradition !== "general") {
+          tradition = TRADITION_LABELS[source.tradition] ?? source.tradition;
+        }
       }
     }
     rows.push({
