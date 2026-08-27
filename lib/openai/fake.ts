@@ -80,13 +80,32 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
   });
 
   // Group cards in pairs for wide spreads to respect paragraph ceilings.
+  const focus = context.reading.focus.label.toLowerCase();
+  // Varied, deterministic per-card closers — chosen by draw order so the
+  // composition never repeats a sentence verbatim across positions.
+  const closers: Array<(positionLabel: string) => string> = [
+    (p) =>
+      `Standing first, it sets the register the rest of the spread answers to: whatever follows is read against the ground laid down in "${p.toLowerCase()}".`,
+    () =>
+      `In practice this is what the situation can actually lean on while ${focus} is being worked out — the resource on hand rather than the one wished for.`,
+    () =>
+      `The reading treats this less as an obstacle than as pressure with information in it: where the pattern strains says as much as where it flows.`,
+    () =>
+      `For ${focus}, the invitation here is concrete rather than abstract, and it is present tense — something already standing in the pattern, waiting on attention.`,
+    () =>
+      `What this position asks to be developed is already present in the spread, undergrown rather than absent, and the surrounding cards suggest the conditions it would need.`,
+    () =>
+      `Read as direction, it describes the bend of the current rather than a promised destination; the pattern points, and the pointing is the information.`,
+    (p) =>
+      `Its weight comes less from drama than from placement: sitting in "${p.toLowerCase()}", the card's register colors everything that passes through this part of the question.`,
+  ];
   const groupSize = cards.length > 7 ? 2 : 1;
   for (let i = 0; i < cards.length; i += groupSize) {
     const group = cards.slice(i, i + groupSize);
-    const sentences = group.flatMap((card) => [
+    const sentences = group.flatMap((card, j) => [
       `${card.name}${card.orientation === "reversed" ? ", reversed," : ""} takes the "${card.positionLabel}" position, ${card.positionPurpose.toLowerCase().replace(/\.$/, "")}.`,
       card.canonicalMeaningSummary,
-      `Read against ${context.reading.focus.label.toLowerCase()}, it marks how that current moves through this part of the pattern — less an event than a manner of proceeding, one that colors whatever passes through the position while it holds.`,
+      closers[(i + j) % closers.length]!(card.positionLabel),
     ]);
     paragraphs.push({
       text: sentences.join(" "),
