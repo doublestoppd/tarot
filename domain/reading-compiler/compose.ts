@@ -71,8 +71,49 @@ function nameRev(card: ReadingContextCard): string {
   return `${card.name}${card.orientation === "reversed" ? ", reversed," : ""}`;
 }
 
+/** "Death, reversed" — object form for slots followed by punctuation. */
+function nameRevEnd(card: ReadingContextCard): string {
+  return `${card.name}${card.orientation === "reversed" ? ", reversed" : ""}`;
+}
+
+/** "the hidden factor seat" — spoken naturally, never scare-quoted. */
 function seatOf(card: ReadingContextCard): string {
-  return `"${card.positionLabel.toLowerCase().replace(/\s*\/\s*/g, " and ")}"`;
+  return `the ${card.positionLabel.toLowerCase().replace(/\s*\/\s*/g, " and ")} seat`;
+}
+
+/** The chosen lens as a natural intent clause, not a pasted menu label. */
+const INSIGHT_INTENT: Record<string, string> = {
+  broader_picture: "reading for the whole picture",
+  not_obvious: "asking for the part that is easy to miss",
+  influence: "asking what is driving things",
+  support: "asking what you can lean on",
+  resistance: "asking what is in the way",
+  change: "asking what is shifting",
+  caution: "asking where to be careful",
+  potential: "asking what is opening up",
+  integration: "asking how to hold it all together",
+  direction: "asking which way things are leaning",
+};
+
+/** Domains that are about people, so the reading should say so. */
+const RELATIONAL_DOMAINS = new Set(["love", "home", "conflict"]);
+
+const TITLE_SMALL_WORDS = new Set([
+  "a", "an", "the", "and", "or", "of", "in", "at", "to", "on", "for",
+  "with", "without", "from", "that", "its", "your", "own", "not",
+]);
+
+/** "a load being set down" → "A Load Being Set Down". */
+function titleCase(phrase: string): string {
+  return phrase
+    .split(/\s+/)
+    .map((word, i) =>
+      i > 0 && TITLE_SMALL_WORDS.has(word)
+        ? word
+        : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join(" ")
+    .replace(/[.,]$/, "");
 }
 
 const NUM_WORDS = [
@@ -163,17 +204,27 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
   const outcomeCard = byBeat.get("outcome")?.[0];
 
   const focusPhrase = humanize(context.reading.focus.label);
-  const insightPhrase = humanize(context.reading.insight.label);
+  const intent =
+    INSIGHT_INTENT[context.reading.insight.id] ??
+    `reading for ${humanize(context.reading.insight.label)}`;
 
   // ---- Opening: the question, then the arc of the whole spread. ----------
   const opening: string[] = [
     v(
-      `You asked the cards about ${focusPhrase}, with an eye out for ${insightPhrase}.`,
-      `You brought the cards a question about ${focusPhrase}, and asked them to watch for ${insightPhrase}.`,
-      `The question on the table is ${focusPhrase}, read with an eye toward ${insightPhrase}.`,
-      `You came in asking about ${focusPhrase}. The lens you chose: ${insightPhrase}.`,
+      `You asked the cards about ${focusPhrase}, ${intent}.`,
+      `You brought the cards a question about ${focusPhrase}, ${intent} above all.`,
+      `The question on the table is ${focusPhrase}, and you came ${intent}.`,
+      `You came in with ${focusPhrase} on your mind, ${intent}.`,
     ),
   ];
+  if (RELATIONAL_DOMAINS.has(context.reading.domain.id)) {
+    opening.push(
+      v(
+        `Because this is a question about people, read what follows as things moving between you and them, not only inside you.`,
+        `A question like this always has more than one person in it, so read these cards as the space between people, not just your own interior.`,
+      ),
+    );
+  }
   const thesisParts: string[] = [];
   if (groundCard) thesisParts.push(`${essenceOf(groundCard)} in plain view`);
   if (depthCard) thesisParts.push(`${essenceOf(depthCard)} underneath it`);
@@ -209,7 +260,7 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
     opening.push(
       v(
         `And the whole spread is strung between ${ta} and ${tb}. That strain is not a flaw in the reading. It is the reading.`,
-        `The spread also pulls two ways at once, toward ${ta} and toward ${tb}. Keep hold of that tension; it is doing real work.`,
+        `The spread also pulls two ways at once, toward ${ta} and toward ${tb}. Both pulls are earned, and the cards below show exactly where each one lives.`,
         `There is a live wire running through it too: ${ta} at one end, ${tb} at the other. The reading happens between them.`,
       ),
     );
@@ -247,7 +298,7 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
         "You would know it in the wild as",
       );
       const parts = [
-        `${groundOpen} ${nameRev(first!)} holds the ${seatOf(first!)} seat, ${lcPurpose(first!.positionPurpose)}. ${first!.canonicalMeaningSummary}${groundTexture ? ` ${textureLead} ${groundTexture}.` : ""}`,
+        `${groundOpen} ${nameRev(first!)} holds ${seatOf(first!)}, ${lcPurpose(first!.positionPurpose)}. ${first!.canonicalMeaningSummary}${groundTexture ? ` ${textureLead} ${groundTexture}.` : ""}`,
       ];
       for (const card of rest) {
         parts.push(`${nameRev(card)} widens that ground from ${seatOf(card)}: ${card.canonicalMeaningSummary}`);
@@ -265,21 +316,31 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
       const depthTexture = textureOf(first!);
       const reveal = groundCard
         ? v(
-            `Now the part ${groundCard.name} does not show. Underneath the surface sits ${nameRev(first!)} in the ${seatOf(first!)} seat.`,
-            `But ${groundCard.name} is only the visible half. Below it, ${nameRev(first!)} holds the ${seatOf(first!)} seat.`,
-            `The spread then reaches under that surface. In the ${seatOf(first!)} seat sits ${nameRev(first!)}.`,
+            `Now the part ${groundCard.name} does not show. Underneath the surface sits ${nameRev(first!)} in ${seatOf(first!)}.`,
+            `But ${groundCard.name} is only the visible half. Below it, ${nameRev(first!)} holds ${seatOf(first!)}.`,
+            `The spread then reaches under that surface. In ${seatOf(first!)} sits ${nameRev(first!)}.`,
           )
         : v(
-            `Down at the base of this sits ${nameRev(first!)} in the ${seatOf(first!)} seat.`,
-            `Underneath everything else, ${nameRev(first!)} holds the ${seatOf(first!)} seat.`,
+            `Down at the base of this sits ${nameRev(first!)} in ${seatOf(first!)}.`,
+            `Underneath everything else, ${nameRev(first!)} holds ${seatOf(first!)}.`,
           );
       const recognize = v(
         "You may recognize it as",
         "In practice it can look like",
         "It tends to wear a familiar costume:",
       );
+      // A hidden-factor claim about behavior is offered as a hypothesis,
+      // never a charge — the reading cannot know it fits.
+      const hypothesis =
+        first!.orientation === "reversed"
+          ? " " +
+            v(
+              `If that does not sound like you, set it down gently, but test it against your actual week first. Hidden factors earn the name by being easy to deny.`,
+              `Hold that as a hypothesis to try on, not a verdict to accept. If it fits nothing you recognize, let it go.`,
+            )
+          : "";
       const parts = [
-        `${reveal} ${first!.canonicalMeaningSummary}${depthTexture ? ` ${recognize} ${depthTexture}.` : ""}`,
+        `${reveal} ${first!.canonicalMeaningSummary}${depthTexture ? ` ${recognize} ${depthTexture}.` : ""}${hypothesis}`,
       ];
       if (groundCard) {
         parts.push(
@@ -380,7 +441,7 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
         const parts = [
           v(
             `The pushback in this story lives with ${nameRev(remaining[0]!)} in ${seatOf(remaining[0]!)}. ${remaining[0]!.canonicalMeaningSummary}`,
-            `What resists you here is ${nameRev(remaining[0]!)}, in the ${seatOf(remaining[0]!)} seat. ${remaining[0]!.canonicalMeaningSummary}`,
+            `What resists you here is ${nameRevEnd(remaining[0]!)}, in ${seatOf(remaining[0]!)}. ${remaining[0]!.canonicalMeaningSummary}`,
           ),
         ];
         for (const card of remaining.slice(1)) {
@@ -402,7 +463,7 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
         v(
           `Out in the open, where everyone involved can feel it, ${nameRev(first!)} stands in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
           `In plain air, felt by everyone in the room, ${nameRev(first!)} holds ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
-          `The visible weather here is ${nameRev(first!)} in the ${seatOf(first!)} seat. ${first!.canonicalMeaningSummary}`,
+          `The visible weather here is ${nameRev(first!)} in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
         ),
       ];
       for (const card of rest) {
@@ -418,29 +479,47 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
 
     if (beat === "motion") {
       const [first, ...rest] = beatCards;
-      const parts = [
-        v(
-          `The moving part is ${nameRev(first!)} in the ${seatOf(first!)} seat. ${first!.canonicalMeaningSummary}`,
-          `What is actually in motion here: ${nameRev(first!)}, in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
-          `${nameRev(first!)} is where things are moving, from the ${seatOf(first!)} seat. ${first!.canonicalMeaningSummary}`,
-        ),
-      ];
-      for (const card of rest) {
-        parts.push(`The other moving part: ${nameRev(card)} in ${seatOf(card)}. ${card.canonicalMeaningSummary}`);
+      const isPulls = beatCards.every((c) => c.positionId.startsWith("pull_"));
+      const parts: string[] = [];
+      if (isPulls && beatCards.length >= 2) {
+        // A choice's two pulls each speak through their own card.
+        for (const card of beatCards) {
+          const pullName = humanize(card.positionLabel); // "pull toward change"
+          parts.push(
+            `The ${pullName} speaks through ${nameRevEnd(card)}. ${card.canonicalMeaningSummary}`,
+          );
+        }
+        parts.push(
+          v(
+            `Those are the two voices in this choice, each with a real case. Notice which one your body already leans toward when nobody is watching; that lean is information.`,
+            `Both pulls are speaking in good faith here. Before you argue with either one, notice which of these two descriptions made your shoulders drop; that is usually the honest one.`,
+          ),
+        );
+      } else {
+        parts.push(
+          v(
+            `The moving part is ${nameRev(first!)} in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
+            `What is actually in motion here: ${nameRevEnd(first!)}, in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
+            `${nameRev(first!)} is where things are moving, from ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
+          ),
+        );
+        for (const card of rest) {
+          parts.push(`The other moving part: ${nameRev(card)} in ${seatOf(card)}. ${card.canonicalMeaningSummary}`);
+        }
+        parts.push(
+          rest.length > 0
+            ? v(
+                `Between those motions is where your actual next step lives.`,
+                `Your next real step sits somewhere between those two motions.`,
+                `Work those two together and the next step names itself.`,
+              )
+            : v(
+                `That is the practice this spread hands you.`,
+                `Treat it as this stretch's assignment.`,
+                `That is the lever you can actually reach.`,
+              ),
+        );
       }
-      parts.push(
-        rest.length > 0
-          ? v(
-              `Between those motions is where your actual next step lives.`,
-              `Your next real step sits somewhere between those two motions.`,
-              `Work those two together and the next step names itself.`,
-            )
-          : v(
-              `That is the practice this spread hands you.`,
-              `Treat it as this stretch's assignment.`,
-              `That is the lever you can actually reach.`,
-            ),
-      );
       emit(parts.join(" "), beatCards);
     }
 
@@ -448,20 +527,29 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
       const [first, ...rest] = beatCards;
       const parts = [
         v(
-          `All of it leans toward ${nameRev(first!)} in the ${seatOf(first!)} seat. ${first!.canonicalMeaningSummary}`,
-          `Everything above tilts toward ${nameRev(first!)}, sitting in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
-          `Follow the grain of the spread and it ends at ${nameRev(first!)}, in the ${seatOf(first!)} seat. ${first!.canonicalMeaningSummary}`,
+          `All of it leans toward ${nameRev(first!)} in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
+          `Everything above tilts toward ${nameRevEnd(first!)}, sitting in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
+          `Follow the grain of the spread and it ends at ${nameRevEnd(first!)}, in ${seatOf(first!)}. ${first!.canonicalMeaningSummary}`,
         ),
       ];
       for (const card of rest) {
         parts.push(`Alongside it, ${nameRev(card)} in ${seatOf(card)}: ${card.canonicalMeaningSummary}`);
       }
-      if (groundCard) {
+      // A reversed direction card is the hazard on the road, not a promised
+      // destination — say so, or the recommended direction reads as doom.
+      if (first!.orientation === "reversed") {
         parts.push(
           v(
-            `Set that against the opening and the whole arc shows itself: this reading runs from ${essenceOf(groundCard)} toward ${essenceOf(first!)}. A direction like that is a current, not a verdict. You can steer inside it.`,
-            `Hold it next to where we started and the arc is plain: from ${essenceOf(groundCard)} toward ${essenceOf(first!)}. That is a drift, not a sentence passed on you, and drift answers to hands.`,
-            `Look back at the first card and the line draws itself, ${essenceOf(groundCard)} moving toward ${essenceOf(first!)}. Nothing about it is sealed; it is the direction things lean while nothing changes.`,
+            `Read that as the hazard sign on this road, not the destination you are owed. Left alone, things drift toward ${essenceOf(first!)}; catching the drift early is exactly what steering is for.`,
+            `That is where the current runs if nothing changes, which is precisely why the spread shows it: ${essenceOf(first!)} is the thing to steer against, and there is still plenty of road.`,
+          ),
+        );
+      } else if (groundCard) {
+        parts.push(
+          v(
+            `Set that against ${groundCard.name} at the start and the whole arc shows itself, leaning toward ${essenceOf(first!)}. A direction like that is a current, not a verdict. You can steer inside it.`,
+            `Hold it next to where ${groundCard.name} opened and the arc is plain, bending toward ${essenceOf(first!)}. That is a drift, not a sentence passed on you, and drift answers to hands.`,
+            `Look back at ${groundCard.name} and the line draws itself, ending in ${essenceOf(first!)}. Nothing about it is sealed; it is the direction things lean while nothing changes.`,
           ),
         );
       } else {
@@ -498,7 +586,16 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
       return true;
     })
     .slice(0, 2);
-  if (patternNodes.length > 0 || personal.length > 0) {
+  // One citable current-sky echo, so the celestial layer the app computes
+  // is visible in the prose, not only claimed in the basis panel.
+  const skyEcho = context.resonances.find(
+    (r) => r.category === "current_sky" && citable.has(r.id),
+  );
+  // When birth details were given but nothing resonated with this draw, say
+  // so plainly — the data was used, honestly, even when it stays quiet.
+  const birthQuiet =
+    context.capability.birthDateProvided && personal.length === 0;
+  if (patternNodes.length > 0 || personal.length > 0 || skyEcho || birthQuiet) {
     const parts: string[] = [];
     if (patternNodes.length > 0) {
       parts.push(
@@ -525,9 +622,31 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
         ),
       );
     }
+    if (skyEcho) {
+      parts.push(
+        v(
+          `The sky over the draw added its own note. ${skyEcho.statement}`,
+          `And the sky at the moment of the shuffle agreed. ${skyEcho.statement}`,
+        ),
+      );
+    }
+    if (birthQuiet) {
+      parts.push(
+        v(
+          `Your birth details were checked against this draw too. Nothing in them repeated strongly enough to lean on, so this reading rests on the cards alone, and says so instead of pretending.`,
+          `The draw was also held up against your own dates and chart. This time nothing echoed loudly, and an honest reading leaves it at that rather than inventing a connection.`,
+        ),
+      );
+    }
+    const signalIds = [
+      ...patternNodes.map((p) => p.id),
+      ...personal.map((p) => p.id),
+      ...(skyEcho ? [skyEcho.id] : []),
+    ];
     paragraphs.push({
       text: parts.join(" "),
-      evidenceIds: [...patternNodes.map((p) => p.id), ...personal.map((p) => p.id)],
+      evidenceIds:
+        signalIds.length > 0 ? signalIds : [(groundCard ?? cards[0]!).evidenceId],
     });
   }
 
@@ -578,10 +697,15 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
       `the day-to-day question is which one is steering, ${essenceOf(helpFirst)} or ${essenceOf(dragFirst)}`,
       `each day quietly chooses between ${essenceOf(helpFirst)} and ${essenceOf(dragFirst)}. Start choosing on purpose`,
     );
+  } else if (groundCard && outcomeCard && outcomeCard.orientation === "reversed") {
+    takeaway = v(
+      `left to itself, this drifts toward ${essenceOf(outcomeCard)}. Catching that drift early is the whole game`,
+      `the drift toward ${essenceOf(outcomeCard)} is visible now, which means it is refusable now`,
+    );
   } else if (groundCard && outcomeCard) {
     takeaway = v(
-      `you are already moving from ${essenceOf(groundCard)} toward ${essenceOf(outcomeCard)}. The reading only asks you to notice`,
       `the move from ${essenceOf(groundCard)} toward ${essenceOf(outcomeCard)} has already begun; your part is to stop interrupting it`,
+      `${essenceOf(outcomeCard)} is not a prize at the end of this. It is a direction you can start walking today`,
     );
   } else {
     takeaway = v(
@@ -589,13 +713,15 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
       `let ${essenceOf(cards[0]!)} stay in view for a while before you decide anything`,
     );
   }
+  const closeAnchorA = outcomeCard ?? cards[cards.length - 1]!;
+  const closeAnchorB = groundCard ?? cards[0]!;
   const closingSentences = [
     v(
       `That is the story these ${numWord(cards.length)} cards tell together.`,
-      `That is what these ${numWord(cards.length)} cards, read as one hand, have to say.`,
-      `So runs the story of these ${numWord(cards.length)} cards.`,
+      `That is what the hand that opened with ${closeAnchorB.name} has to say.`,
+      `So runs the story, ${closeAnchorB.name} to ${closeAnchorA.name}.`,
       `That is the whole of it, ${numWord(cards.length)} cards speaking as one.`,
-      `And there the ${numWord(cards.length)} cards rest their case.`,
+      `And there ${closeAnchorA.name} rests the case.`,
     ),
     v(
       `If you take one line out of this room, take this one: ${takeaway}.`,
@@ -604,32 +730,39 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
     ),
     v(
       `None of it is a verdict: the cards frame the question, and you still hold the answer.`,
-      `Nothing here is a ruling. The cards sketch the field; the moves stay yours.`,
-      `Take it as a map, not a mandate. You are still the one walking.`,
+      `${closeAnchorA.name} points; it does not push. The deciding stays with you.`,
+      `Take it as a map drawn in ${numWord(cards.length)} cards, not a mandate. You are still the one walking.`,
+    ),
+  ];
+  // Stretch, when the depth floor needs it, comes from the spread itself —
+  // never a stack of aftercare boilerplate (at most two additions).
+  const quietCard =
+    cards.find((c) => c !== closeAnchorA && c !== closeAnchorB && c !== depthCard) ??
+    cards[Math.floor(cards.length / 2)]!;
+  const stretchPool = [
+    v(
+      `On a later pass, give ${quietCard.name} a second look. Quiet cards often ripen a few days after the loud ones.`,
+      `${quietCard.name} said the least today, which is sometimes the card worth revisiting once the rest has settled.`,
     ),
     v(
-      `If one part of it stopped you as you read, trust that pause. It is usually pointing at the thing that matters.`,
-      `Whatever snagged your attention on the way through, that snag is information. Start there.`,
-      `The line that made you pause is probably the one to sit with first.`,
+      `It can help to say the reading back in your own words, out loud or on paper. The parts you reach for first are the parts that already landed.`,
+      `Try retelling this in one breath to no one. Whatever survives the retelling is the reading.`,
+    ),
+    v(
+      `And if the spread feels heavier than your actual life does, trust your life. The cards sketch one moment's weather, and moments move.`,
+      `If any of this weighs more than your week actually does, side with your week. Cards describe a moment, and moments move.`,
     ),
   ];
-  const stretchPool = [
-    "A reading like this works best when it is carried lightly. Let the strong threads name what you already sense, and let the strange ones raise a question you had not asked. Come back to the spread in a few days and notice which parts still speak.",
-    "You do not have to act on any of this today. Notice where a card made you pause, and start your own thinking there. The pause is usually pointing at something real.",
-    "If one image stays with you, keep it close. A single card, sat with honestly, often does more work than a whole spread read in a hurry.",
-    "None of this is a command. The cards describe weather, not orders. You stay the one who decides how to walk in it.",
-    "It can help to say the reading back in your own words, out loud or on paper. The parts you reach for first are the parts that already landed.",
-    "And if the spread feels heavier than your actual life does, trust your life. The cards sketch the weather of one moment, and moments move.",
-  ];
   const closingWords = () => closingSentences.join(" ").split(/\s+/).length;
+  const wordFloor = Math.round(DEPTH_TARGETS[context.reading.depth].minWords * 0.85) + 20;
+  let stretches = 0;
   for (const stretch of stretchPool) {
-    if (wordCount() + closingWords() >= DEPTH_TARGETS[context.reading.depth].minWords) {
+    if (stretches >= 2 || wordCount() + closingWords() >= wordFloor) {
       break;
     }
     closingSentences.push(stretch);
+    stretches += 1;
   }
-  const closeAnchorA = outcomeCard ?? cards[cards.length - 1]!;
-  const closeAnchorB = groundCard ?? cards[0]!;
   paragraphs.push({
     text: closingSentences.join(" "),
     evidenceIds: [
@@ -637,13 +770,11 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
     ],
   });
 
+  // Title: the reading's emotional center, not a filing label — the essence
+  // of the card the whole spread leans on (outcome, else depth, else ground).
+  const titleCard = outcomeCard ?? depthCard ?? groundCard ?? cards[0]!;
   return {
-    title: topTheme
-      ? topTheme.label
-          .replace(/^A repeated /, "The Repeating ")
-          .replace(/^A /, "The ")
-          .replace(/^The current of /, "Under ")
-      : `From ${closeAnchorB.name} to ${closeAnchorA.name}`,
+    title: titleCase(essenceOf(titleCard)),
     paragraphs,
     usedEvidenceIds: [...new Set(paragraphs.flatMap((p) => p.evidenceIds))],
     qualityFlags: {

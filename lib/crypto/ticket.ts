@@ -21,7 +21,18 @@ export interface ReadingTicketPayload {
   nonce: string;
   issuedAt: number;
   expiresAt: number;
+  /**
+   * Session binding: hash of the issuing session's rate key. A ticket is
+   * redeemable only by the session that prepared it, so tickets are not
+   * bearer tokens across devices/sessions. Absent on legacy tickets.
+   */
+  sid?: string;
   context: ReadingContext;
+}
+
+/** Binding value derived from a session's rate key hash. */
+export function sessionBinding(rateKeyHash: string): string {
+  return createHash("sha256").update(`ticket-sid:${rateKeyHash}`).digest("hex").slice(0, 24);
 }
 
 export class TicketError extends Error {

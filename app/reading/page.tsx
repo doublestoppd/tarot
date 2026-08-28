@@ -201,7 +201,7 @@ export default function ReadingPage() {
       </article>
 
       <p className="basis-line">
-        Based on{" "}
+        Prepared with{" "}
         {basisParts.map((part, i) => (
           <span key={part}>
             {part}

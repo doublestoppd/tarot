@@ -25,7 +25,7 @@ import { compileReadingContext } from "@/domain/reading-compiler/compile";
 import type { ReadingContext } from "@/domain/reading-compiler/types";
 import { renderDeterministicReading } from "@/domain/reading-compiler/fallback";
 import { getEnv } from "@/lib/config/env";
-import { newReadingNonce, sealTicket } from "@/lib/crypto/ticket";
+import { newReadingNonce, sealTicket, sessionBinding } from "@/lib/crypto/ticket";
 import { getPlace } from "@/lib/places/places";
 
 /**
@@ -46,6 +46,8 @@ export interface PrepareRequest {
   selections: ReadingSelections;
   spreadOverrideId?: string;
   birth?: BirthInput;
+  /** Session rate key hash; when present the ticket binds to this session. */
+  sessionRateKeyHash?: string;
 }
 
 export class PrepareError extends Error {
@@ -205,6 +207,9 @@ export async function prepareReading(
       nonce: newReadingNonce(),
       issuedAt,
       expiresAt,
+      ...(request.sessionRateKeyHash
+        ? { sid: sessionBinding(request.sessionRateKeyHash) }
+        : {}),
       context,
     },
     env.ticketKeyCurrent,

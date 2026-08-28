@@ -101,6 +101,7 @@ export const POST = withRoute("readings/prepare", async (request: NextRequest): 
       },
       ...(body.spreadOverrideId ? { spreadOverrideId: body.spreadOverrideId } : {}),
       ...(birth ? { birth } : {}),
+      sessionRateKeyHash: auth.rateKeyHash,
     });
 
     return apiJson({

@@ -21,7 +21,7 @@ import {
   reserveBudget,
 } from "@/lib/budget/budget";
 import { checkAndIncrement } from "@/lib/rate-limit/rate-limit";
-import { nonceHash, openTicket, TicketError } from "@/lib/crypto/ticket";
+import { nonceHash, openTicket, sessionBinding, TicketError } from "@/lib/crypto/ticket";
 import { actualCostMicro } from "@/lib/openai/cost";
 import { OpenAIReadingSynthesizer } from "@/lib/openai/synthesizer";
 import { FakeReadingSynthesizer } from "@/lib/openai/fake";
@@ -86,6 +86,11 @@ export async function interpretReading(
     );
     context = payload.context;
     readingNonce = payload.nonce;
+    // Session binding: a ticket is redeemable only by the session that
+    // prepared it (never a cross-session bearer token).
+    if (payload.sid && payload.sid !== sessionBinding(request.rateKeyHash)) {
+      return { kind: "error", code: "READING_TICKET_EXPIRED" };
+    }
   } catch (error) {
     if (error instanceof TicketError) {
       return { kind: "error", code: "READING_TICKET_EXPIRED" };
