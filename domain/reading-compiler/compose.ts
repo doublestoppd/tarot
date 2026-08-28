@@ -332,8 +332,16 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
 
   // ---- Corroborating signals: deck mechanics + personal echoes. ----------
   const patternNodes = context.tarotPatterns.filter((p) => citable.has(p.id)).slice(0, 2);
+  // Two natal placements can echo the same card+sign; keep one voice each.
+  const personalTails = new Set<string>();
   const personal = context.resonances
     .filter((r) => r.category === "personal" && citable.has(r.id))
+    .filter((r) => {
+      const tail = r.statement.split(". ").slice(1).join(". ");
+      if (personalTails.has(tail)) return false;
+      personalTails.add(tail);
+      return true;
+    })
     .slice(0, 2);
   if (patternNodes.length > 0 || personal.length > 0) {
     const parts: string[] = [];
