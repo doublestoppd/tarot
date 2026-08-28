@@ -1,4 +1,5 @@
 import { ESSENCES } from "@/data/tarot/essences";
+import { TEXTURES } from "@/data/tarot/textures";
 import type {
   ReadingContextCard,
   ReadingContext,
@@ -55,6 +56,13 @@ function beatFor(positionId: string, positionLabel: string): Beat {
 function essenceOf(card: ReadingContextCard): string {
   const entry = ESSENCES[card.cardId];
   if (!entry) return `what ${card.name} names`;
+  return card.orientation === "reversed" ? entry.reversed : entry.upright;
+}
+
+/** Concrete daily-life image, framed by the caller as possibility. */
+function textureOf(card: ReadingContextCard): string | null {
+  const entry = TEXTURES[card.cardId];
+  if (!entry) return null;
   return card.orientation === "reversed" ? entry.reversed : entry.upright;
 }
 
@@ -174,8 +182,9 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
 
     if (beat === "ground") {
       const [first, ...rest] = beatCards;
+      const groundTexture = textureOf(first!);
       const parts = [
-        `Start with where you are standing. ${nameRev(first!)} holds the ${seatOf(first!)} seat, ${lcPurpose(first!.positionPurpose)}. ${first!.canonicalMeaningSummary}`,
+        `Start with where you are standing. ${nameRev(first!)} holds the ${seatOf(first!)} seat, ${lcPurpose(first!.positionPurpose)}. ${first!.canonicalMeaningSummary}${groundTexture ? ` In daily life, that often looks like ${groundTexture}.` : ""}`,
       ];
       for (const card of rest) {
         parts.push(`${nameRev(card)} widens that ground from ${seatOf(card)}: ${card.canonicalMeaningSummary}`);
@@ -190,8 +199,9 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
 
     if (beat === "depth") {
       const [first, ...rest] = beatCards;
+      const depthTexture = textureOf(first!);
       const parts = [
-        `${groundCard ? `Now the part ${groundCard.name} does not show. ` : ""}Underneath the surface sits ${nameRev(first!)} in the ${seatOf(first!)} seat. ${first!.canonicalMeaningSummary}`,
+        `${groundCard ? `Now the part ${groundCard.name} does not show. ` : ""}Underneath the surface sits ${nameRev(first!)} in the ${seatOf(first!)} seat. ${first!.canonicalMeaningSummary}${depthTexture ? ` You may recognize it as ${depthTexture}.` : ""}`,
       ];
       if (groundCard) {
         parts.push(
@@ -228,9 +238,10 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
           `${parts.length <= 1 ? "In your corner" : "Also in your corner"}, ${nameRev(card)} holds ${seatOf(card)}. ${card.canonicalMeaningSummary}`,
         );
       }
-      for (const card of dragCards) {
+      for (const [dragIndex, card] of dragCards.entries()) {
+        const dragTexture = dragIndex === 0 ? textureOf(card) : null;
         parts.push(
-          `Pressing the other way, ${nameRev(card)} sits in ${seatOf(card)}. ${card.canonicalMeaningSummary}`,
+          `Pressing the other way, ${nameRev(card)} sits in ${seatOf(card)}. ${card.canonicalMeaningSummary}${dragTexture ? ` That side of it tends to show up as ${dragTexture}.` : ""}`,
         );
       }
       if (dragCards.length > 0) {
@@ -363,10 +374,25 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
   // ---- Closing, stretched from a pool until the depth floor is met. ------
   const wordCount = () =>
     paragraphs.map((p) => p.text).join(" ").split(/\s+/).length;
+  // The takeaway: one line that reframes the question, built from the
+  // spread's own structure (root feeds surface > contest > arc).
+  const helpFirst = byBeat.get("help")?.[0];
+  const dragFirst = byBeat.get("drag")?.[0];
+  let takeaway: string;
+  if (groundCard && depthCard) {
+    takeaway = `what shows up as ${essenceOf(groundCard)} is being fed by ${essenceOf(depthCard)}. Tend the root and the surface follows`;
+  } else if (helpFirst && dragFirst) {
+    takeaway = `the day-to-day question is which one is steering, ${essenceOf(helpFirst)} or ${essenceOf(dragFirst)}`;
+  } else if (groundCard && outcomeCard) {
+    takeaway = `you are already moving from ${essenceOf(groundCard)} toward ${essenceOf(outcomeCard)}. The reading only asks you to notice`;
+  } else {
+    takeaway = `keep ${essenceOf(cards[0]!)} where you can see it this week`;
+  }
   const closingSentences = [
     `That is the story these ${numWord(cards.length)} cards tell together.`,
+    `If you take one line out of this room, take this one: ${takeaway}.`,
     `None of it is a verdict: the cards frame the question, and you still hold the answer.`,
-    `If one line of it stopped you as you read, trust that pause. It is usually pointing at the part that matters.`,
+    `If one part of it stopped you as you read, trust that pause. It is usually pointing at the thing that matters.`,
   ];
   const stretchPool = [
     "A reading like this works best when it is carried lightly. Let the strong threads name what you already sense, and let the strange ones raise a question you had not asked. Come back to the spread in a few days and notice which parts still speak.",

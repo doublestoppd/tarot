@@ -70,7 +70,7 @@ const envSchema = z.object({
   OPENAI_MODEL: z.string().default("gpt-5.6-luna"),
   OPENAI_REASONING_EFFORT: z
     .enum(["minimal", "low", "medium", "high"])
-    .default("low"),
+    .default("medium"),
   OPENAI_MAX_OUTPUT_TOKENS_FOCUSED: z.coerce.number().int().positive().default(1400),
   OPENAI_MAX_OUTPUT_TOKENS_DEEP: z.coerce.number().int().positive().default(2200),
   OPENAI_MAX_OUTPUT_TOKENS_COMPREHENSIVE: z.coerce

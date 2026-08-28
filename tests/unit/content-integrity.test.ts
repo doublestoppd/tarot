@@ -40,6 +40,17 @@ describe("deck completeness", () => {
     expect(Object.keys(ESSENCES).length).toBe(78);
   });
 
+  it("every card has a lived texture for both orientations", async () => {
+    const { TEXTURES } = await import("@/data/tarot/textures");
+    for (const card of ALL_CARDS) {
+      const texture = TEXTURES[card.id];
+      expect(texture, `${card.id} missing texture`).toBeDefined();
+      expect(texture!.upright.length).toBeGreaterThan(10);
+      expect(texture!.reversed.length).toBeGreaterThan(10);
+    }
+    expect(Object.keys(TEXTURES).length).toBe(78);
+  });
+
   it("every card has meanings, keywords, and valid source refs", () => {
     for (const card of ALL_CARDS) {
       expect(card.uprightMeaning.length).toBeGreaterThan(40);

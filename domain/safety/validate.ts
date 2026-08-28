@@ -87,7 +87,13 @@ const UNSUPPORTED_ESOTERICA: Array<[RegExp, string]> = [
 ];
 
 const DIRECT_PREDICTION: Array<[RegExp, string]> = [
-  [/\byou will (?!find yourself weighing|want to decide)/i, "you will …"],
+  // Hedged or perceptual futures ("you will probably…", "you will notice…")
+  // are a reader's normal register and allowed (ADR 0010); what is barred
+  // is promising concrete outcomes.
+  [
+    /\byou will(?! probably| likely| often| sometimes| may| might| find| notice| feel| want| know| recognize| see| hear| catch| keep| still| have to decide)\b/i,
+    "you will …",
+  ],
   [/\bis going to happen\b/i, "is going to happen"],
   [/\bguaranteed\b/i, "guaranteed"],
   [/\bwill certainly\b/i, "will certainly"],
@@ -215,11 +221,14 @@ export function validateSynthesis(
       detail: `${synthesis.paragraphs.length} > ${targets.maxParagraphs}`,
     });
   }
-  if (wordCount < targets.minWords) {
+  // Depth floors are guidance for the provider; the gate only fires when a
+  // reading is badly under target (ADR 0010 loosening).
+  const shortFloor = Math.round(targets.minWords * 0.85);
+  if (wordCount < shortFloor) {
     problems.push({
       code: "TOO_SHORT",
       severity: "repairable",
-      detail: `${wordCount} words < ${targets.minWords}`,
+      detail: `${wordCount} words < ${shortFloor}`,
     });
   }
   if (wordCount > targets.maxWords * 1.25) {
