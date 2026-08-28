@@ -20,7 +20,10 @@ import { computeQualityFlags } from "@/domain/safety/validate";
  *   2. the keyless development/E2E engine,
  *   3. the test double (behaviors "fail"/"invalid").
  * It is never a silent substitute when OpenAI is configured and selected.
- * All template prose follows the plain-language rule (ADR 0009).
+ *
+ * Voice (ADR 0009): a reader talking to one person about their question —
+ * second person, concrete, plain. Position-aware notes apply each card to
+ * its seat instead of abstract commentary.
  */
 export class FakeReadingSynthesizer implements ReadingSynthesizer {
   constructor(private readonly behavior: "ok" | "fail" | "invalid" = "ok") {}
@@ -44,6 +47,111 @@ export class FakeReadingSynthesizer implements ReadingSynthesizer {
   }
 }
 
+/** "Habits & patterns" → "habits and patterns" for use mid-sentence. */
+function humanize(label: string): string {
+  return label.toLowerCase().replace(/\s*&\s*/g, " and ");
+}
+
+/** Lowercase only the leading article of a theme label ("A Saturn tone"). */
+function lcFirst(label: string): string {
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}
+
+function lcPurpose(purpose: string): string {
+  return purpose.charAt(0).toLowerCase() + purpose.slice(1).replace(/\.$/, "");
+}
+
+/** One applied sentence per card, chosen by what its seat is for. */
+function positionNote(positionId: string, positionLabel: string, index: number): string {
+  const key = `${positionId} ${positionLabel}`.toLowerCase();
+  const pick = (a: string, b: string) => (index % 2 === 0 ? a : b);
+  if (/hidden|blind|unseen|less_visible|root|foundation|hopes_fears/.test(key)) {
+    return pick(
+      "That is the part of the story working out of sight. Give it a slower second look.",
+      "You may not have put words to this part yet. The card just did it for you.",
+    );
+  }
+  if (/support|resource|strength|remains/.test(key)) {
+    return pick(
+      "Whatever else this spread stirs up, this is the steady thing. Lean on it.",
+      "When the rest of the reading wobbles, come back to this card. It is already in your hands.",
+    );
+  }
+  if (/resistance|constraint|tension|crossing|caution|waning/.test(key)) {
+    return pick(
+      "In this seat, that is the thing pressing on you. Even a good thing can act as a wall, and naming it loosens it.",
+      "Do not read it as doom. It is friction, and friction can be worked with.",
+    );
+  }
+  if (/direction|outcome|next|near_development|emerging|ripening|trajectory/.test(key)) {
+    return pick(
+      "Read this as the lean of things, not a locked result. Your hands are still on it.",
+      "It shows where the current drifts if nothing changes. Changing something is still allowed.",
+    );
+  }
+  if (/past|ending|recent/.test(key)) {
+    return pick(
+      "This piece is on its way out. Let it finish leaving.",
+      "It shaped where you are, but it is not in charge anymore.",
+    );
+  }
+  if (/pull_/.test(key)) {
+    return pick(
+      "That is one of the two tugs in your choice. Feel it honestly before you answer it.",
+      "Do not rush to silence this pull. It knows something the other one does not.",
+    );
+  }
+  if (/integrat|adjustment|to_develop|repetition/.test(key)) {
+    return pick(
+      "This is the working part of the reading: something to practice, not just notice.",
+      "Small moves here change the whole picture. Start smaller than feels serious.",
+    );
+  }
+  if (/expressed|environment|influence|aim|opportunity/.test(key)) {
+    return pick(
+      "This one is out in the open, shaping the room whether or not anyone names it.",
+      "Everyone involved can feel this part, even if nobody has said it yet.",
+    );
+  }
+  if (/present|surface|atmosphere|orientation|self|cycle_now|pattern/.test(key)) {
+    return pick(
+      "Start here. This is the ground you are actually standing on.",
+      "Whatever else the cards say, they are saying it about this.",
+    );
+  }
+  return pick(
+    "Let it sit beside its neighbors. The cards explain each other.",
+    "Hold it lightly and watch what it touches in the seats around it.",
+  );
+}
+
+function cardIntro(
+  name: string,
+  reversed: boolean,
+  positionLabel: string,
+  purpose: string,
+  index: number,
+  total: number,
+): string {
+  const namePart = `${name}${reversed ? ", reversed" : ""}`;
+  const seat = `"${positionLabel.toLowerCase()}"`;
+  const why = lcPurpose(purpose);
+  if (index === 0) {
+    return `The first card out was ${namePart}, in the ${seat} seat: ${why}.`;
+  }
+  if (index === total - 1) {
+    return `The last card, ${namePart}, landed on ${seat}: ${why}.`;
+  }
+  const middles = [
+    `Next comes ${namePart}, holding ${seat}: ${why}.`,
+    `In the ${seat} seat, ${why}, you drew ${namePart}.`,
+    `Then ${namePart} turned up in ${seat}: ${why}.`,
+    `For ${seat}, ${why}, the deck gave you ${namePart}.`,
+    `${namePart} sits in ${seat}: ${why}.`,
+  ];
+  return middles[(index - 1) % middles.length]!;
+}
+
 function composeFromContext(context: ReadingContext): ReadingSynthesis {
   const { cards } = context.reading;
   const paragraphs: Array<{ text: string; evidenceIds: string[] }> = [];
@@ -59,54 +167,43 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
     : [];
   const tension = context.tensions[0];
 
+  const focusPhrase = humanize(context.reading.focus.label);
+  const insightPhrase = humanize(context.reading.insight.label);
+
   const opening: string[] = [
-    `This ${context.reading.spread.name} was laid for ${context.reading.domain.label.toLowerCase()}. The focus is ${context.reading.focus.label.toLowerCase()}, seen through the lens of "${context.reading.insight.label.toLowerCase()}."`,
+    `You asked the cards about ${focusPhrase}, with an eye out for ${insightPhrase}.`,
   ];
   if (topTheme) {
     opening.push(
-      `${topTheme.label} is the strongest thread here. Several separate signals point the same way, and the reading keeps returning to it.`,
+      `Before anything else, notice this: ${lcFirst(topTheme.label)} runs through the whole spread. More than one signal points the same way, so keep it in mind as you read.`,
     );
   }
   if (tension) {
     opening.push(
-      `At the same time, the spread holds both ${tension.themeA.toLowerCase()} and ${tension.themeB.toLowerCase()}. Neither one agrees to leave.`,
+      `The cards are also pulling in two directions at once, toward ${tension.themeA.toLowerCase()} and toward ${tension.themeB.toLowerCase()}. That tug is not a flaw in the reading. It is the reading.`,
     );
   }
-  opening.push(
-    "The reading below moves card by card. Each position is a question, and each card is its answer.",
-  );
+  opening.push("Here is what came up, seat by seat.");
   paragraphs.push({
     text: opening.join(" "),
     evidenceIds: themeIds.length > 0 ? themeIds.slice(0, 2) : [cards[0]!.evidenceId],
   });
 
   // Group cards in pairs for wide spreads to respect paragraph ceilings.
-  const focus = context.reading.focus.label.toLowerCase();
-  // Varied, deterministic per-card closers — chosen by draw order so the
-  // composition never repeats a sentence verbatim across positions.
-  const closers: Array<(positionLabel: string) => string> = [
-    () =>
-      `It stands first, so it sets the tone. Everything after it is read against this ground.`,
-    () =>
-      `While ${focus} is being worked out, this is the thing to lean on. It is the resource at hand, not the one you wish you had.`,
-    () =>
-      `Read this as pressure with information in it, not just a wall. Where the pattern strains tells you as much as where it flows.`,
-    () =>
-      `For ${focus}, the invitation here is concrete. It is already standing in the pattern, waiting on your attention.`,
-    () =>
-      `What this position asks for is already present, just small. The cards around it hint at what it needs to grow.`,
-    () =>
-      `Read as direction, this shows the bend of the current, not a promised end point. The pointing itself is the information.`,
-    (p) =>
-      `Its weight comes from where it sits. In "${p.toLowerCase()}", this card colors everything that passes through this part of the question.`,
-  ];
   const groupSize = cards.length > 7 ? 2 : 1;
   for (let i = 0; i < cards.length; i += groupSize) {
     const group = cards.slice(i, i + groupSize);
     const sentences = group.flatMap((card, j) => [
-      `${card.name}${card.orientation === "reversed" ? ", reversed," : ""} takes the "${card.positionLabel}" position, ${card.positionPurpose.toLowerCase().replace(/\.$/, "")}.`,
+      cardIntro(
+        card.name,
+        card.orientation === "reversed",
+        card.positionLabel,
+        card.positionPurpose,
+        i + j,
+        cards.length,
+      ),
       card.canonicalMeaningSummary,
-      closers[(i + j) % closers.length]!(card.positionLabel),
+      positionNote(card.positionId, card.positionLabel, i + j),
     ]);
     paragraphs.push({
       text: sentences.join(" "),
@@ -120,8 +217,9 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
   if (patternNodes.length > 0) {
     paragraphs.push({
       text:
+        "A few shapes in the deal itself are worth naming. " +
         patternNodes.map((p) => p.statement).join(" ") +
-        " The same note keeps arriving through different doors. That repetition is what earns it weight in this reading.",
+        " When the same note arrives through different doors like that, it earns extra weight.",
       evidenceIds: patternNodes.map((p) => p.id),
     });
   }
@@ -133,14 +231,14 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
     paragraphs.push({
       text:
         personal.map((p) => p.statement).join(" ") +
-        " These threads are quieter than the cards, and they are read that way. They back up what the spread already says. They are here because they truly repeat the pattern, not to pad the reading.",
+        " These threads are personal to you: your own numbers and chart happening to repeat what the shuffle drew. The cards would stand without them, but they add weight exactly where they land.",
       evidenceIds: personal.map((p) => p.id),
     });
   }
 
   if (tension) {
     paragraphs.push({
-      text: `The main strain in this reading runs between ${tension.themeA.toLowerCase()} and ${tension.themeB.toLowerCase()}. Both sides have real support in the cards, so the honest reading keeps both. The question is not which side wins. It is how much of each your present situation can hold.`,
+      text: `The strongest tug-of-war in this spread runs between ${tension.themeA.toLowerCase()} and ${tension.themeB.toLowerCase()}. Both sides have real cards behind them, so do not force a winner. Ask instead which parts of your situation each one lives in. They are probably not in the same room.`,
       evidenceIds: [...tension.evidenceAIds.slice(0, 2), ...tension.evidenceBIds.slice(0, 2)],
     });
   }
@@ -149,11 +247,8 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
   const wordCount = () =>
     paragraphs.map((p) => p.text).join(" ").split(/\s+/).length;
   if (wordCount() < DEPTH_TARGETS[context.reading.depth].minWords - 40) {
-    const positionList = context.reading.spread.positions
-      .map((p) => `"${p.label.toLowerCase()}"`)
-      .join(", ");
     paragraphs.push({
-      text: `The ${context.reading.spread.name} lays the reading across ${context.reading.spread.positions.length} stations: ${positionList}. The order matters as much as any single card. Early positions describe the ground already in place. Later ones describe the movement growing out of it. Held in the "${context.reading.timePerspective.label.toLowerCase()}" frame, the spread reads as one connected motion, not a row of separate answers. The quieter cards do the connecting work between the louder ones.`,
+      text: `One note on reading the ${context.reading.spread.name} as a whole. It is built as a sequence: the early seats describe ground already under you, and the later seats describe movement growing out of that ground. Held in the "${context.reading.timePerspective.label.toLowerCase()}" frame, it reads as one connected gesture, not ${cards.length} separate answers. The quieter cards are doing connective work between the louder ones.`,
       evidenceIds: [cards[Math.floor(cards.length / 2)]!.evidenceId],
     });
   }
@@ -161,14 +256,14 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
   const lastCard = cards[cards.length - 1]!;
   const firstCard = cards[0]!;
   const closingSentences = [
-    `Taken whole, the spread describes a pattern, not a verdict.`,
-    `It opens where ${firstCard.name} set the tone. It closes where ${lastCard.name}, in the "${lastCard.positionLabel}" position, marks the direction things point.`,
-    `Between those poles, the reading has named what repeats, what strains against what, and what waits in reserve. How far any of it maps onto your life stays in your hands. The cards are the frame, not the answer.`,
+    `That is the whole spread. It opens with ${firstCard.name} and closes with ${lastCard.name}, and between them it has named what repeats, what pulls against what, and what you have to work with.`,
+    `None of this is a verdict: the cards frame the question, and you still hold the answer.`,
+    `If one card stopped you as you read, trust that pause. It is usually pointing at the part that matters.`,
   ];
   // Final stretch for very sparse spreads: extend the closing (never the
   // paragraph count) until the depth floor is met.
   const stretchPool = [
-    "A reading like this works best when it is carried lightly. Let the strong threads name what you already sense. Let the strange ones raise a question you had not asked. Come back to the spread in a few days and notice which parts still speak.",
+    "A reading like this works best when it is carried lightly. Let the strong threads name what you already sense, and let the strange ones raise a question you had not asked. Come back to the spread in a few days and notice which parts still speak.",
     "You do not have to act on any of this today. Notice where a card made you pause, and start your own thinking there. The pause is usually pointing at something real.",
     "If one image stays with you, keep it close. A single card, sat with honestly, often does more work than a whole spread read in a hurry.",
     "None of this is a command. The cards describe weather, not orders. You stay the one who decides how to walk in it.",
@@ -188,7 +283,7 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
   return {
     title: topTheme
       ? topTheme.label.replace(/^A repeated /, "The Repeating ").replace(/^A /, "The ").replace(/^The current of /, "Under ")
-      : `Between the Positions`,
+      : `From ${firstCard.name} to ${lastCard.name}`,
     paragraphs,
     usedEvidenceIds: [...new Set(paragraphs.flatMap((p) => p.evidenceIds))],
     qualityFlags: {

@@ -4,17 +4,19 @@ import type { ReadingContext, ReadingSynthesis } from "./types";
  * Deterministic fallback reading (spec §29.1, §49.3): shown when the full
  * interpretation is unavailable (AI disabled, budget closed, provider down).
  * Assembled entirely from the compiled context — cards, positions, canonical
- * meanings, themes, and tensions — in the same calm register, without any
- * technical or mystical excuse language.
+ * meanings, themes, and tensions — in the same warm, plain voice as the full
+ * reading, without any technical or mystical excuse language.
  */
 export function renderDeterministicReading(context: ReadingContext): ReadingSynthesis {
   const paragraphs: Array<{ text: string; evidenceIds: string[] }> = [];
   const { cards } = context.reading;
+  const humanize = (label: string): string =>
+    label.toLowerCase().replace(/\s*&\s*/g, " and ");
 
-  // Opening: spread, domain, dominant theme if present.
+  // Opening: the question in human terms, plus the dominant theme if present.
   const topTheme = context.themes[0];
   const openingParts = [
-    `This ${context.reading.spread.name} was drawn for ${context.reading.domain.label.toLowerCase()}. The focus is ${context.reading.focus.label.toLowerCase()}, read through the lens of "${context.reading.insight.label.toLowerCase()}."`,
+    `You asked the cards about ${humanize(context.reading.focus.label)}, reading for ${humanize(context.reading.insight.label)}. Here is what the ${context.reading.spread.name} laid out.`,
   ];
   if (topTheme) {
     openingParts.push(topTheme.shortThesis);
@@ -31,7 +33,7 @@ export function renderDeterministicReading(context: ReadingContext): ReadingSynt
     const group = cards.slice(i, i + 2);
     const sentences = group.map(
       (c) =>
-        `${c.name}${c.orientation === "reversed" ? ", reversed," : ""} holds the "${c.positionLabel}" position, ${c.positionPurpose.toLowerCase().replace(/\.$/, "")}. ${c.canonicalMeaningSummary}`,
+        `${c.name}${c.orientation === "reversed" ? ", reversed," : ""} holds the "${c.positionLabel.toLowerCase()}" seat, ${c.positionPurpose.charAt(0).toLowerCase()}${c.positionPurpose.slice(1).replace(/\.$/, "")}. ${c.canonicalMeaningSummary}`,
     );
     paragraphs.push({
       text: sentences.join(" "),
@@ -52,7 +54,7 @@ export function renderDeterministicReading(context: ReadingContext): ReadingSynt
   const tension = context.tensions[0];
   if (tension) {
     paragraphs.push({
-      text: `The spread holds ${tension.themeA.toLowerCase()} and ${tension.themeB.toLowerCase()} at the same time. Neither cancels the other. Give each its place while things develop.`,
+      text: `The spread holds ${tension.themeA.toLowerCase()} and ${tension.themeB.toLowerCase()} at the same time. Both are real, so do not force a winner. Give each its place while things develop.`,
       evidenceIds: [...tension.evidenceAIds, ...tension.evidenceBIds].slice(0, 4),
     });
   }
@@ -60,7 +62,7 @@ export function renderDeterministicReading(context: ReadingContext): ReadingSynt
   // Closing: symbolic frame left to the reader.
   const lastCard = cards[cards.length - 1]!;
   paragraphs.push({
-    text: `Taken together, the cards describe a pattern, not a verdict. ${lastCard.name} in the "${lastCard.positionLabel}" position marks where things point right now. How that fits your life is yours to weigh.`,
+    text: `Taken together, the cards frame a pattern, not a verdict. ${lastCard.name} in the "${lastCard.positionLabel.toLowerCase()}" seat marks where things point right now. How that fits your life stays your call.`,
     evidenceIds: [lastCard.evidenceId],
   });
 
