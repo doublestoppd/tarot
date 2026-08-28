@@ -19,11 +19,12 @@ export default function PrivacyPage() {
 
       <h2>Readings are not stored</h2>
       <p>
-        Birth facts you choose to enter are used only to prepare the current
-        reading. They travel inside an encrypted, short-lived reading ticket
-        that your browser holds. The app does not store them as history.
-        Closing or refreshing the page ends the reading. The app keeps no
-        record of which cards you drew or what your reading said.
+        Birth facts you choose to enter, and any optional note you write
+        about your situation, are used only to prepare the current reading.
+        They travel inside an encrypted, short-lived reading ticket that
+        your browser holds. The app does not store them as history. Closing
+        or refreshing the page ends the reading. The app keeps no record of
+        which cards you drew, what you wrote, or what your reading said.
       </p>
 
       <h2>What the app does keep</h2>
@@ -38,7 +39,10 @@ export default function PrivacyPage() {
       <p>
         Writing the full interpretation means sending a trimmed, derived
         summary of the symbols — never your raw birth date, time, or
-        birthplace — to our AI provider (OpenAI&apos;s API). Under
+        birthplace — to our AI provider (OpenAI&apos;s API). If you choose
+        to write an optional note about your situation, that note is
+        included in this one request so the reading can speak to it, and is
+        never stored by the app. Under
         OpenAI&apos;s current API terms, API data is not used to train models
         unless the customer opts in, and we do not. The provider may keep
         data for up to about 30 days to watch for abuse. We do not claim zero
@@ -52,7 +56,10 @@ export default function PrivacyPage() {
         A reading is saved only if you choose to create a private share link.
         Your browser then encrypts a trimmed copy of the finished reading:
         title, text, cards, general topic, and date. Birth details and the
-        calculation basis are never included. The server stores only the
+        calculation basis are never included, and your optional note is not
+        attached as data. The reading&apos;s own text is shared as written,
+        though, so if the reading quotes or answers your note, those lines
+        travel with it. The server stores only the
         encrypted data. The unlock key lives in the link itself, after the
         “#”, and is never sent to the server. Links expire on their own,
         after 90 days by default. Encrypted share data deleted from the live

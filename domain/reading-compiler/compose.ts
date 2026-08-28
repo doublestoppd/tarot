@@ -207,16 +207,44 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
   const intent =
     INSIGHT_INTENT[context.reading.insight.id] ??
     `reading for ${humanize(context.reading.insight.label)}`;
+  // The asker's own words (ADR 0011): echoed once, verbatim, unless they
+  // touch a topic the reading is barred from voicing back.
+  const rawSituation = context.reading.situation;
+  const situationEcho =
+    rawSituation && !/pregnan|diagnos|lawsuit|suicid|kill|terminal/i.test(rawSituation)
+      ? (rawSituation.length > 220
+          ? `${rawSituation.slice(0, 217).trimEnd()}…`
+          : rawSituation
+        ).replace(/["“”]/g, "'").replace(/\s*\n+\s*/g, " ")
+      : null;
 
   // ---- Opening: the question, then the arc of the whole spread. ----------
-  const opening: string[] = [
-    v(
-      `You asked the cards about ${focusPhrase}, ${intent}.`,
-      `You brought the cards a question about ${focusPhrase}, ${intent} above all.`,
-      `The question on the table is ${focusPhrase}, and you came ${intent}.`,
-      `You came in with ${focusPhrase} on your mind, ${intent}.`,
-    ),
-  ];
+  const opening: string[] = [];
+  if (situationEcho) {
+    opening.push(
+      v(
+        `You told the cards what this is about, in your own words: "${situationEcho}" The spread below answers that, ${intent}.`,
+        `Your own words set the table: "${situationEcho}" Keep that sentence in view while you read; every card below is aimed at it.`,
+        `This reading starts from what you wrote: "${situationEcho}" The cards take it from there, ${intent}.`,
+      ),
+    );
+  } else if (rawSituation) {
+    opening.push(
+      v(
+        `You told the cards what this is about in your own words, and the spread below answers it directly, ${intent}.`,
+        `You wrote down what is going on, and the cards below speak to exactly that, ${intent}.`,
+      ),
+    );
+  } else {
+    opening.push(
+      v(
+        `You asked the cards about ${focusPhrase}, ${intent}.`,
+        `You brought the cards a question about ${focusPhrase}, ${intent} above all.`,
+        `The question on the table is ${focusPhrase}, and you came ${intent}.`,
+        `You came in with ${focusPhrase} on your mind, ${intent}.`,
+      ),
+    );
+  }
   if (RELATIONAL_DOMAINS.has(context.reading.domain.id)) {
     opening.push(
       v(
@@ -728,6 +756,14 @@ export function composeNarrativeReading(context: ReadingContext): ReadingSynthes
       `If only one sentence survives this reading, let it be this: ${takeaway}.`,
       `Carry one thing out with you: ${takeaway}.`,
     ),
+    ...(rawSituation
+      ? [
+          v(
+            `Set that against the words you wrote at the start; the cards were answering your sentence, not a general question.`,
+            `Now put that next to what you told the cards up top. That is the situation this whole spread was aimed at.`,
+          ),
+        ]
+      : []),
     v(
       `None of it is a verdict: the cards frame the question, and you still hold the answer.`,
       `${closeAnchorA.name} points; it does not push. The deciding stays with you.`,

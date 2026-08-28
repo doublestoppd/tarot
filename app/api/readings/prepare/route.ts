@@ -22,6 +22,7 @@ const bodySchema = z.strictObject({
   depth: z.enum(["focused", "deep", "comprehensive"]),
   reversalsEnabled: z.boolean(),
   spreadOverrideId: z.string().min(1).max(40).optional(),
+  situation: z.string().max(500).optional(),
   birth: z
     .strictObject({
       date: z
@@ -101,6 +102,7 @@ export const POST = withRoute("readings/prepare", async (request: NextRequest): 
       },
       ...(body.spreadOverrideId ? { spreadOverrideId: body.spreadOverrideId } : {}),
       ...(birth ? { birth } : {}),
+      ...(body.situation ? { situation: body.situation } : {}),
       sessionRateKeyHash: auth.rateKeyHash,
     });
 

@@ -76,6 +76,12 @@ export interface ReadingContext {
     focus: { id: string; label: string };
     insight: { id: string; label: string };
     timePerspective: { id: string; label: string };
+    /**
+     * Optional note in the asker's own words (ADR 0011). Lives only inside
+     * the encrypted ticket and the one provider call; never stored, never
+     * part of share artifacts.
+     */
+    situation?: string;
     depth: Depth;
     spread: {
       id: string;

@@ -34,6 +34,7 @@ type Depth = "focused" | "deep" | "comprehensive";
 export function PrepareReading() {
   const router = useRouter();
   const [domainId, setDomainId] = useState<string | null>(null);
+  const [situation, setSituation] = useState("");
   const [focusId, setFocusId] = useState<string | null>(null);
   const [insightId, setInsightId] = useState(DEFAULT_INSIGHT_ID);
   const [timeId, setTimeId] = useState(DEFAULT_TIME_PERSPECTIVE_ID);
@@ -166,6 +167,9 @@ export function PrepareReading() {
           placeId: place?.placeId ?? null,
           dstAmbiguityChoice: dstChoice,
         };
+      }
+      if (situation.trim().length > 0) {
+        body.situation = situation.trim().slice(0, 500);
       }
       const response = await fetch("/api/readings/prepare", {
         method: "POST",
@@ -307,7 +311,34 @@ export function PrepareReading() {
         </section>
       )}
 
-      {/* Step 5 — personalization */}
+      {/* Step 5 — in your own words (optional free text, ADR 0011) */}
+      {domain && (
+        <section aria-labelledby="step-situation" style={{ marginTop: "1.6rem" }}>
+          <span className="optional-tag">Optional</span>
+          <h2 id="step-situation">In your own words</h2>
+          <p style={{ color: "var(--text-dim)", fontSize: "0.92rem" }}>
+            A few lines about what is going on, if you want the reading aimed
+            at your actual situation.
+          </p>
+          <textarea
+            id="situation"
+            className="field"
+            rows={3}
+            maxLength={500}
+            value={situation}
+            onChange={(e) => setSituation(e.target.value)}
+            placeholder="e.g. I've been offered a new role in another city and can't decide whether to take it."
+            style={{ width: "100%", resize: "vertical", minHeight: "4.5rem" }}
+          />
+          <p style={{ color: "var(--text-faint)", fontSize: "0.8rem", marginTop: "0.4rem" }}>
+            Travels encrypted inside this one reading and is shared with the
+            interpretation engine once. Never stored, never part of share
+            links. {situation.length > 0 ? `${situation.length}/500` : ""}
+          </p>
+        </section>
+      )}
+
+      {/* Step 6 — personalization */}
       {domain && (
         <section className="panel" aria-labelledby="step-personal" style={{ marginTop: "2rem" }}>
           <span className="optional-tag">Optional</span>

@@ -44,6 +44,8 @@ export interface CompilerInputs {
   transits: TransitHit[];
   numerology: NumerologyProfile | null;
   birthProvided: { date: boolean; time: boolean; place: boolean };
+  /** Optional sanitized note in the asker's own words (ADR 0011). */
+  situation?: string;
 }
 
 const BODY_LABELS: Record<string, string> = {
@@ -340,6 +342,7 @@ export function compileReadingContext(inputs: CompilerInputs): ReadingContext {
       focus: { id: focus.id, label: focus.label },
       insight: { id: insight.id, label: insight.label },
       timePerspective: { id: time.id, label: time.label },
+      ...(inputs.situation ? { situation: inputs.situation } : {}),
       depth: selections.depth,
       spread: {
         id: spread.id,
@@ -379,6 +382,7 @@ export function minimizeForProvider(context: ReadingContext): object {
       focus: context.reading.focus.label,
       insight: context.reading.insight.label,
       timePerspective: context.reading.timePerspective.label,
+      situationNote: context.reading.situation ?? null,
       depth: context.reading.depth,
       spread: {
         name: context.reading.spread.name,

@@ -112,12 +112,29 @@ const PROHIBITED_TOPICS: Array<[RegExp, string]> = [
   [/\b(cheating|is unfaithful|having an affair)\b/i, "third-party accusation"],
 ];
 
-const BIOGRAPHY_INVENTION: Array<[RegExp, string]> = [
-  [/\byour (boss|manager|coworker|colleague)\b/i, "invented workplace figure"],
-  [/\byour (husband|wife|boyfriend|girlfriend|partner('s)? name)\b/i, "invented relationship fact"],
-  [/\byour (divorce|breakup|childhood trauma|illness)\b/i, "invented life event"],
-  [/\byour (mother|father|parents) (did|said|left|never)\b/i, "invented family fact"],
+// Each entry names the role/event words that, when the asker themself
+// mentioned them in the situation note (ADR 0011), make the reference
+// grounded rather than invented.
+const BIOGRAPHY_INVENTION: Array<[RegExp, string, string[]]> = [
+  [/\byour (boss|manager|coworker|colleague)\b/i, "invented workplace figure", ["boss", "manager", "coworker", "colleague", "work"]],
+  [/\byour (husband|wife|boyfriend|girlfriend|partner('s)? name)\b/i, "invented relationship fact", ["husband", "wife", "boyfriend", "girlfriend", "partner"]],
+  [/\byour (divorce|breakup|childhood trauma|illness)\b/i, "invented life event", ["divorce", "breakup", "childhood", "trauma", "illness", "sick"]],
+  [/\byour (mother|father|parents) (did|said|left|never)\b/i, "invented family fact", ["mother", "father", "parent", "mom", "dad"]],
 ];
+
+/** Biography references are invented only if the asker never mentioned the figure. */
+function scanBiography(text: string, situation: string | undefined): string[] {
+  const situationLower = (situation ?? "").toLowerCase();
+  const hits: string[] = [];
+  for (const [pattern, label, groundingWords] of BIOGRAPHY_INVENTION) {
+    if (!pattern.test(text)) continue;
+    const grounded =
+      situationLower.length > 0 &&
+      groundingWords.some((word) => situationLower.includes(word));
+    if (!grounded) hits.push(label);
+  }
+  return hits;
+}
 
 function scanPatterns(
   text: string,
@@ -144,6 +161,7 @@ function contextVocabulary(context: ReadingContext): string {
     ...context.themes.map((t) => `${t.label} ${t.shortThesis}`),
     ...context.currentSky.map((s) => s.displayFact),
     ...context.personalFactors.map((p) => p.displayFact),
+    context.reading.situation ?? "",
   ]
     .join(" ")
     .toLowerCase();
@@ -266,7 +284,7 @@ export function validateSynthesis(
   for (const hit of scanPatterns(fullText, PROHIBITED_TOPICS)) {
     problems.push({ code: "PROHIBITED_TOPIC", severity: "fatal", detail: hit });
   }
-  for (const hit of scanPatterns(fullText, BIOGRAPHY_INVENTION)) {
+  for (const hit of scanBiography(fullText, context.reading.situation)) {
     problems.push({ code: "UNSUPPORTED_BIOGRAPHY", severity: "fatal", detail: hit });
   }
 
@@ -342,7 +360,7 @@ export function computeQualityFlags(
   const text = synthesis.paragraphs.map((p) => p.text).join("\n");
   return {
     containsDirectPrediction: scanPatterns(text, DIRECT_PREDICTION).length > 0,
-    containsUnsupportedBiography: scanPatterns(text, BIOGRAPHY_INVENTION).length > 0,
+    containsUnsupportedBiography: scanBiography(text, undefined).length > 0,
     containsUnsupportedCorrespondence:
       scanPatterns(text, UNSUPPORTED_ESOTERICA).length > 0,
   };

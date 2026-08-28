@@ -96,10 +96,11 @@ export function ShareDialog({
           </ul>
         </div>
         <p style={{ color: "var(--text-faint)", fontSize: "0.85rem" }}>
-          The reading text itself may mention sky or number details where they
-          mattered. Private links expire after {shareTtlDays} days. The link
-          is encrypted in this browser, and anyone opening it will still need
-          the access code.
+          The reading text itself may mention sky or number details where
+          they mattered, and may quote or answer a note you wrote. Private
+          links expire after {shareTtlDays} days. The link is encrypted in
+          this browser, and anyone opening it will still need the access
+          code.
         </p>
 
         {error && (

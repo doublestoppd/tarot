@@ -31,8 +31,13 @@ test("unauthorized root shows the gate, wrong code shows generic copy", async ({
 test("a complete reading with zero birth information", async ({ page }) => {
   await unlock(page);
   await page.click("text=General");
+  await page.fill("#situation", "I keep starting projects and abandoning them halfway.");
   await page.click('button:has-text("Draw the cards")');
   await page.waitForSelector(".reading-title", { timeout: 30_000 });
+  // The optional note aims the reading and is echoed in the prose (ADR 0011).
+  await expect(page.locator(".prose-reading")).toContainText(
+    "abandoning them halfway",
+  );
   // Cards revealed with names; prose present; no chat box anywhere.
   await expect(page.locator(".card-caption strong").first()).toBeVisible();
   await expect(page.locator(".prose-reading p").first()).toBeVisible();

@@ -48,6 +48,25 @@ export interface PrepareRequest {
   birth?: BirthInput;
   /** Session rate key hash; when present the ticket binds to this session. */
   sessionRateKeyHash?: string;
+  /** Optional note in the asker's own words (ADR 0011); sanitized here. */
+  situation?: string;
+}
+
+/**
+ * Situation-note hygiene (ADR 0011): trim, drop control characters except
+ * newlines, collapse blank runs, cap at 500 characters. Returns undefined
+ * when nothing meaningful remains.
+ */
+export function sanitizeSituation(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  const cleaned = raw
+    .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim()
+    .slice(0, 500)
+    .trim();
+  return cleaned.length >= 3 ? cleaned : undefined;
 }
 
 export class PrepareError extends Error {
@@ -187,6 +206,7 @@ export async function prepareReading(
     }
   }
 
+  const situation = sanitizeSituation(request.situation);
   const context = compileReadingContext({
     momentUtc,
     selections: request.selections,
@@ -197,6 +217,7 @@ export async function prepareReading(
     transits,
     numerology,
     birthProvided,
+    ...(situation ? { situation } : {}),
   });
 
   const issuedAt = now.getTime();
