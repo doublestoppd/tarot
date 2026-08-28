@@ -27,6 +27,19 @@ describe("deck completeness", () => {
     expect(numbers).toEqual([...Array(22).keys()]);
   });
 
+  it("every card has a narrative essence for both orientations", async () => {
+    const { ESSENCES } = await import("@/data/tarot/essences");
+    for (const card of ALL_CARDS) {
+      const essence = ESSENCES[card.id];
+      expect(essence, `${card.id} missing essence`).toBeDefined();
+      expect(essence!.upright.length).toBeGreaterThan(4);
+      expect(essence!.reversed.length).toBeGreaterThan(4);
+      expect(essence!.upright.length).toBeLessThanOrEqual(45);
+      expect(essence!.reversed.length).toBeLessThanOrEqual(45);
+    }
+    expect(Object.keys(ESSENCES).length).toBe(78);
+  });
+
   it("every card has meanings, keywords, and valid source refs", () => {
     for (const card of ALL_CARDS) {
       expect(card.uprightMeaning.length).toBeGreaterThan(40);

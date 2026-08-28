@@ -1,0 +1,96 @@
+/**
+ * Card essences: short noun-phrase handles (article included) used by the
+ * narrative composer to reference a card mid-sentence — "this reading runs
+ * from a fresh spark toward a completed circle." One per orientation.
+ * These are compositional handles, not meanings; the full meaning prose
+ * lives on the card definitions.
+ */
+export interface CardEssence {
+  upright: string;
+  reversed: string;
+}
+
+export const ESSENCES: Record<string, CardEssence> = {
+  major_00_fool: { upright: "an open first step", reversed: "a start with no footing yet" },
+  major_01_magician: { upright: "focused skill ready to act", reversed: "scattered aim" },
+  major_02_high_priestess: { upright: "a quiet inner knowing", reversed: "an ignored inner voice" },
+  major_03_empress: { upright: "growth that comes from care", reversed: "care gone off balance" },
+  major_04_emperor: { upright: "a steady frame", reversed: "a frame gone rigid" },
+  major_05_hierophant: { upright: "a steadying tradition", reversed: "an outgrown rule" },
+  major_06_lovers: { upright: "a choice that joins", reversed: "a choice being dodged" },
+  major_07_chariot: { upright: "drive under control", reversed: "drive without steering" },
+  major_08_strength: { upright: "patient courage", reversed: "doubted strength" },
+  major_09_hermit: { upright: "clarifying time alone", reversed: "solitude that overstayed" },
+  major_10_wheel: { upright: "a turn of timing", reversed: "a loop that keeps repeating" },
+  major_11_justice: { upright: "an honest reckoning", reversed: "a scale gone uneven" },
+  major_12_hanged_man: { upright: "a useful pause", reversed: "a pause gone stale" },
+  major_13_death: { upright: "a true ending", reversed: "an ending still being carried" },
+  major_14_temperance: { upright: "patient blending", reversed: "a mix that is off" },
+  major_15_devil: { upright: "the grip of a habit", reversed: "a chain coming loose" },
+  major_16_tower: { upright: "an honest collapse", reversed: "a slow-motion break" },
+  major_17_star: { upright: "a quiet refill of hope", reversed: "an emptied well" },
+  major_18_moon: { upright: "half-lit uncertainty", reversed: "a lifting fog" },
+  major_19_sun: { upright: "plain daylight", reversed: "a dimmed light" },
+  major_20_judgement: { upright: "a call to close an old chapter", reversed: "a call left ringing" },
+  major_21_world: { upright: "a completed circle", reversed: "one missing last step" },
+
+  wands_01: { upright: "a fresh spark", reversed: "a stalled spark" },
+  wands_02: { upright: "a plan at the edge of leaving", reversed: "planning that replaces leaving" },
+  wands_03: { upright: "effort already crossing the water", reversed: "returns coming back slow" },
+  wands_04: { upright: "a threshold worth celebrating", reversed: "a frame that wants fastening" },
+  wands_05: { upright: "sparring friction", reversed: "a stale fight" },
+  wands_06: { upright: "a visible win", reversed: "hollow applause" },
+  wands_07: { upright: "defended high ground", reversed: "a wearying defense" },
+  wands_08: { upright: "sudden speed", reversed: "jammed signals" },
+  wands_09: { upright: "tired endurance", reversed: "a guard kept up too long" },
+  wands_10: { upright: "an overloaded back", reversed: "a load being set down" },
+  wands_page: { upright: "an eager untested idea", reversed: "sparks without follow-through" },
+  wands_knight: { upright: "a full gallop", reversed: "haste outrunning aim" },
+  wands_queen: { upright: "warm confidence", reversed: "a brittle fire" },
+  wands_king: { upright: "vision with authority", reversed: "promises outrunning follow-through" },
+
+  cups_01: { upright: "an opening heart", reversed: "a cup run dry" },
+  cups_02: { upright: "a fair exchange", reversed: "an uneven pouring" },
+  cups_03: { upright: "shared joy", reversed: "a crowded surface" },
+  cups_04: { upright: "a full but restless mood", reversed: "returning appetite" },
+  cups_05: { upright: "grief with something left standing", reversed: "a turn toward what remains" },
+  cups_06: { upright: "a sweet memory", reversed: "a past holding the pen" },
+  cups_07: { upright: "a shelf of shining options", reversed: "options narrowing to a real list" },
+  cups_08: { upright: "a chosen walking-away", reversed: "a leaving left half-done" },
+  cups_09: { upright: "earned contentment", reversed: "satisfaction gone thin" },
+  cups_10: { upright: "feeling at full span", reversed: "harmony being performed" },
+  cups_page: { upright: "a small message from the heart", reversed: "feelings with no address" },
+  cups_knight: { upright: "an offer in motion", reversed: "charm without carry-through" },
+  cups_queen: { upright: "deep feeling with a shoreline", reversed: "a tide past its line" },
+  cups_king: { upright: "deep water, well governed", reversed: "calm used as a lid" },
+
+  swords_01: { upright: "a clean cut of clarity", reversed: "truth handled carelessly" },
+  swords_02: { upright: "a blindfolded standoff", reversed: "a tie about to break" },
+  swords_03: { upright: "a named heartbreak", reversed: "mending underway" },
+  swords_04: { upright: "ordered rest", reversed: "rest being refused" },
+  swords_05: { upright: "a win with a bill attached", reversed: "an aftermath under repair" },
+  swords_06: { upright: "a crossing to calmer water", reversed: "a crossing kept postponed" },
+  swords_07: { upright: "strategy at an angle", reversed: "a workaround coming to light" },
+  swords_08: { upright: "a cage built from beliefs", reversed: "bindings coming loose" },
+  swords_09: { upright: "the mind at three in the morning", reversed: "worry meeting daylight" },
+  swords_10: { upright: "an ending past argument", reversed: "getting up after the ending" },
+  swords_page: { upright: "alert questions", reversed: "words outrunning facts" },
+  swords_knight: { upright: "an argument at full charge", reversed: "speed without brakes" },
+  swords_queen: { upright: "an exact, honest eye", reversed: "an edge without padding" },
+  swords_king: { upright: "a principled verdict", reversed: "a mind closed over" },
+
+  pentacles_01: { upright: "a seed you can hold", reversed: "a seed left unplanted" },
+  pentacles_02: { upright: "a working juggle", reversed: "a dropped rhythm" },
+  pentacles_03: { upright: "craft meeting craft", reversed: "work out of dialogue" },
+  pentacles_04: { upright: "a tight grip on safety", reversed: "a hand starting to open" },
+  pentacles_05: { upright: "a cold stretch with help nearby", reversed: "shelter found at last" },
+  pentacles_06: { upright: "giving and taking, carefully weighed", reversed: "strings on the gift" },
+  pentacles_07: { upright: "a slow crop worth judging", reversed: "impatience with a slow crop" },
+  pentacles_08: { upright: "honest repetition building skill", reversed: "repeats that stopped improving" },
+  pentacles_09: { upright: "a garden of your own making", reversed: "comfort walled off" },
+  pentacles_10: { upright: "wealth that outlives a season", reversed: "a tangled legacy" },
+  pentacles_page: { upright: "careful groundwork", reversed: "plans still in the notebook" },
+  pentacles_knight: { upright: "a slow horse that arrives", reversed: "a method gone heavy" },
+  pentacles_queen: { upright: "practical care", reversed: "a caretaker left off the list" },
+  pentacles_king: { upright: "steady stewardship", reversed: "prosperity gone stiff" },
+};
