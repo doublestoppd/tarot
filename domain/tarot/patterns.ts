@@ -75,6 +75,13 @@ function conceptLabel(conceptId: string): string {
   return raw.charAt(0).toUpperCase() + raw.slice(1);
 }
 
+/** "A", "A and B", "A, B, and C". */
+function listJoin(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
 /** Resolve the astrological/elemental concepts of one drawn card. */
 export function resolveCardConcepts(drawn: DrawnCard): CardConcepts {
   const card = getCard(drawn.cardId);
@@ -263,9 +270,7 @@ export function extractPatterns(
       patterns.push({
         id: `pat_number_${family}`,
         kind: "number_repetition",
-        statement: `The number ${family} repeats across ${cards
-          .map(nameOf)
-          .join(" and ")}.`,
+        statement: `The number ${family} repeats across ${listJoin(cards.map(nameOf))}.`,
         cardIds: cards.map((c) => c.card.id),
         conceptIds: [`number:${family}`],
         weight: exactPips >= 2 ? 4 : 3,

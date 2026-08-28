@@ -230,6 +230,18 @@ const BODY_LABELS: Record<string, string> = {
   ic: "IC",
 };
 
+/** "an Aquarius card" but "a Taurus card". */
+function aOrAn(word: string): "a" | "an" {
+  return /^[aeiou]/i.test(word) ? "an" : "a";
+}
+
+/** "A", "A and B", "A, B, and C". */
+function listJoin(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
 /** "the Sun"/"the Moon"/"the North Node" but bare planet names. */
 function bodyPhrase(body: string): string {
   const label = BODY_LABELS[body] ?? body;
@@ -319,7 +331,7 @@ export function personalResonanceEvidence(
         .map((d) => getCard(d.cardId))
         .filter((c) => c.numerologyNumber !== null && c.numerologyNumber === pn.value);
       if (matching.length > 0) {
-        const names = matching.map((c) => c.canonicalName).join(" and ");
+        const names = listJoin(matching.map((c) => c.canonicalName));
         nodes.push(
           node(
             "ev_res",
@@ -360,7 +372,7 @@ export function personalResonanceEvidence(
             node(
               "ev_res",
               "personal",
-              `Your birth chart has ${bodyPhrase(placement.body)} in ${signLabel(placement.sign)}. ${card.canonicalName} is a ${signLabel(placement.sign)} card in this tradition, so the draw echoes your chart.`,
+              `Your birth chart has ${bodyPhrase(placement.body)} in ${signLabel(placement.sign)}. ${card.canonicalName} is ${aOrAn(signLabel(placement.sign))} ${signLabel(placement.sign)} card in this tradition, so the draw echoes your chart.`,
               10,
               [`natal:${placement.body}`, `draw:${card.id}`],
               {
@@ -462,7 +474,7 @@ export function currentSkyEvidence(
             node(
               "ev_sky",
               "current_sky",
-              `The ${BODY_LABELS[body.body]} is in ${signLabel(attribution.sign)} right now. ${card.canonicalName} is a ${signLabel(attribution.sign)} card, so the sky echoes the draw.`,
+              `The ${BODY_LABELS[body.body]} is in ${signLabel(attribution.sign)} right now. ${card.canonicalName} is ${aOrAn(signLabel(attribution.sign))} ${signLabel(attribution.sign)} card, so the sky echoes the draw.`,
               5,
               [`current:${body.body}`, `draw:${card.id}`],
               {

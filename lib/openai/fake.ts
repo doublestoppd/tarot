@@ -61,10 +61,23 @@ function lcPurpose(purpose: string): string {
   return purpose.charAt(0).toLowerCase() + purpose.slice(1).replace(/\.$/, "");
 }
 
-/** One applied sentence per card, chosen by what its seat is for. */
-function positionNote(positionId: string, positionLabel: string, index: number): string {
+/**
+ * One applied sentence per card, chosen by what its seat is for. `seen`
+ * counts uses per category so repeated seat-kinds alternate variants
+ * instead of repeating a sentence verbatim.
+ */
+function positionNote(
+  positionId: string,
+  positionLabel: string,
+  seen: Map<string, number>,
+): string {
   const key = `${positionId} ${positionLabel}`.toLowerCase();
-  const pick = (a: string, b: string) => (index % 2 === 0 ? a : b);
+  const pick = (a: string, b: string) => {
+    const category = a.slice(0, 24);
+    const count = seen.get(category) ?? 0;
+    seen.set(category, count + 1);
+    return count % 2 === 0 ? a : b;
+  };
   if (/hidden|blind|unseen|less_visible|root|foundation|hopes_fears/.test(key)) {
     return pick(
       "That is the part of the story working out of sight. Give it a slower second look.",
@@ -133,21 +146,24 @@ function cardIntro(
   index: number,
   total: number,
 ): string {
-  const namePart = `${name}${reversed ? ", reversed" : ""}`;
+  // Object form ends the name phrase; subject form re-closes the comma so
+  // "The Star, reversed, sits …" stays grammatical.
+  const objectForm = `${name}${reversed ? ", reversed" : ""}`;
+  const subjectForm = `${name}${reversed ? ", reversed," : ""}`;
   const seat = `"${positionLabel.toLowerCase()}"`;
   const why = lcPurpose(purpose);
   if (index === 0) {
-    return `The first card out was ${namePart}, in the ${seat} seat: ${why}.`;
+    return `The first card out was ${objectForm}, in the ${seat} seat: ${why}.`;
   }
   if (index === total - 1) {
-    return `The last card, ${namePart}, landed on ${seat}: ${why}.`;
+    return `The last card, ${objectForm}, landed on ${seat}: ${why}.`;
   }
   const middles = [
-    `Next comes ${namePart}, holding ${seat}: ${why}.`,
-    `In the ${seat} seat, ${why}, you drew ${namePart}.`,
-    `Then ${namePart} turned up in ${seat}: ${why}.`,
-    `For ${seat}, ${why}, the deck gave you ${namePart}.`,
-    `${namePart} sits in ${seat}: ${why}.`,
+    `Next comes ${objectForm}, holding ${seat}: ${why}.`,
+    `In the ${seat} seat, ${why}, you drew ${objectForm}.`,
+    `Then ${subjectForm} turned up in ${seat}: ${why}.`,
+    `For ${seat}, ${why}, the deck gave you ${objectForm}.`,
+    `${subjectForm} sits in ${seat}: ${why}.`,
   ];
   return middles[(index - 1) % middles.length]!;
 }
@@ -191,6 +207,7 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
 
   // Group cards in pairs for wide spreads to respect paragraph ceilings.
   const groupSize = cards.length > 7 ? 2 : 1;
+  const noteCategoriesSeen = new Map<string, number>();
   for (let i = 0; i < cards.length; i += groupSize) {
     const group = cards.slice(i, i + groupSize);
     const sentences = group.flatMap((card, j) => [
@@ -203,7 +220,7 @@ function composeFromContext(context: ReadingContext): ReadingSynthesis {
         cards.length,
       ),
       card.canonicalMeaningSummary,
-      positionNote(card.positionId, card.positionLabel, i + j),
+      positionNote(card.positionId, card.positionLabel, noteCategoriesSeen),
     ]);
     paragraphs.push({
       text: sentences.join(" "),
